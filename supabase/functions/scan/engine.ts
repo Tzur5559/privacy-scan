@@ -116,19 +116,104 @@ function hostOf(u: string): string {
   try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; }
 }
 
+// ---------- הגנה מ-SSRF: הסורק לעולם לא פונה לכתובות פנימיות ----------
+
+const MAX_BYTES = 2_000_000;   // לא קוראים יותר מ-2MB מעמוד
+const MAX_REDIRECTS = 5;
+
+function isPrivateIPv4(ip: string): boolean {
+  const p = ip.split(".").map(Number);
+  if (p.length !== 4 || p.some(n => !Number.isInteger(n) || n < 0 || n > 255)) return true;
+  const [a, b] = p;
+  return a === 0 || a === 10 || a === 127 || a >= 224 ||
+    (a === 100 && b >= 64 && b <= 127) || (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) ||
+    (a === 192 && b === 0) || (a === 198 && (b === 18 || b === 19));
+}
+function isPrivateIPv6(ip: string): boolean {
+  const s = ip.toLowerCase();
+  if (s === "::" || s === "::1") return true;
+  if (s.startsWith("::ffff:")) return isPrivateIPv4(s.slice(7));
+  return /^(fc|fd|fe8|fe9|fea|feb|ff)/.test(s);
+}
+
+// בדיקה סטטית של כתובת: רק http/https, פורט רגיל, שם דומיין אמיתי (לא IP)
+export function staticSafe(raw: string): URL | null {
+  let u: URL;
+  try { u = new URL(raw); } catch { return null; }
+  if (u.protocol !== "https:" && u.protocol !== "http:") return null;
+  if (u.username || u.password) return null;
+  if (u.port && u.port !== "80" && u.port !== "443") return null;
+  const h = u.hostname.toLowerCase().replace(/\.$/, "");
+  if (!h.includes(".") || h.length > 253) return null;
+  if (/^[\d.]+$/.test(h) || h.includes(":") || h.startsWith("[")) return null;      // IP ישיר אסור
+  if (/^0x|^\d+$/.test(h)) return null;
+  if (/(^|\.)(localhost|local|internal|intranet|lan|home|corp|arpa)$/.test(h)) return null;
+  if (/(^|\.)supabase\.(co|in|com)$/.test(h)) return null;                         // לא סורקים את התשתית שלנו
+  return u;
+}
+
+// בדיקה דינמית: הדומיין חייב להצביע רק לכתובות ציבוריות (נגד DNS שמפנה פנימה)
+async function dohAddrs(host: string, type: "A" | "AAAA"): Promise<string[]> {
+  const r = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(host)}&type=${type}`, { headers: { accept: "application/dns-json" } });
+  if (!r.ok) throw new Error("doh");
+  const j = await r.json();
+  // type 1 = A, type 28 = AAAA (מדלגים על CNAME שבדרך)
+  return (j.Answer || []).filter((a: { type: number }) => a.type === 1 || a.type === 28).map((a: { data: string }) => String(a.data));
+}
+async function resolvesPublic(host: string): Promise<boolean> {
+  try {
+    const [a, aaaa] = await Promise.all([dohAddrs(host, "A"), dohAddrs(host, "AAAA").catch(() => [] as string[])]);
+    const addrs = [...a, ...aaaa];
+    if (!addrs.length) return false;
+    return addrs.every(x => x.includes(":") ? !isPrivateIPv6(x) : !isPrivateIPv4(x));
+  } catch { return false; }                        // אם לא הצלחנו לבדוק, לא סורקים
+}
+
+async function readCapped(r: Response): Promise<string> {
+  if (!r.body) return "";
+  const reader = r.body.getReader();
+  const chunks: Uint8Array[] = []; let n = 0;
+  while (n < MAX_BYTES) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value); n += value.length;
+  }
+  try { await reader.cancel(); } catch { /* */ }
+  const buf = new Uint8Array(Math.min(n, MAX_BYTES)); let o = 0;
+  for (const c of chunks) { const take = Math.min(c.length, buf.length - o); buf.set(c.subarray(0, take), o); o += take; if (o >= buf.length) break; }
+  return new TextDecoder("utf-8", { fatal: false }).decode(buf);
+}
+
 async function fetchText(url: string, timeoutMs = 12000): Promise<{ ok: boolean; status: number; text: string; finalUrl: string; headers: Headers }> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  const fail = (status = 0) => ({ ok: false, status, text: "", finalUrl: url, headers: new Headers() });
   try {
-    const r = await fetch(url, {
-      redirect: "follow",
-      signal: ctrl.signal,
-      headers: { "User-Agent": "PrivacyScanIL/0.1 (passive compliance check; +contact via site)", "Accept": "text/html,*/*" },
-    });
-    const text = r.ok ? await r.text() : "";
-    return { ok: r.ok, status: r.status, text, finalUrl: r.url || url, headers: r.headers };
+    let current = url;
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      const u = staticSafe(current);
+      if (!u || !(await resolvesPublic(u.hostname))) return fail(403);
+      const r = await fetch(u.toString(), {
+        redirect: "manual",                         // כל הפניה נבדקת מחדש
+        signal: ctrl.signal,
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; PrivacyScanIL/0.2; passive compliance check)", "Accept": "text/html,*/*", "Accept-Language": "he-IL,he;q=0.9,en;q=0.5" },
+      });
+      if (r.status >= 300 && r.status < 400) {
+        const loc = r.headers.get("location");
+        try { await r.body?.cancel(); } catch { /* */ }
+        if (!loc) return fail(r.status);
+        current = new URL(loc, u).toString();
+        continue;
+      }
+      const ctype = r.headers.get("content-type") || "";
+      const text = r.ok && /html|text|xml/i.test(ctype || "text/html") ? await readCapped(r) : "";
+      if (!text) { try { await r.body?.cancel(); } catch { /* */ } }
+      return { ok: r.ok && !!text, status: r.status, text, finalUrl: u.toString(), headers: r.headers };
+    }
+    return fail(310);
   } catch {
-    return { ok: false, status: 0, text: "", finalUrl: url, headers: new Headers() };
+    return fail();
   } finally { clearTimeout(t); }
 }
 
