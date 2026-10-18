@@ -3,208 +3,440 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>בדיקת פרטיות לאתר</title>
-<meta name="description" content="בדיקה חינמית: האם האתר שלך עומד בתיקון 13 לחוק הגנת הפרטיות">
+<title>פרטיות בטוח | בדיקת האתר שלך לפי תיקון 13</title>
+<meta name="description" content="בדיקה חינמית תוך דקה: האם האתר של העסק שלך עומד בחובת היידוע ובדרישות תיקון 13 לחוק הגנת הפרטיות.">
+<meta property="og:title" content="פרטיות בטוח — האתר שלך עומד בחוק הגנת הפרטיות?">
+<meta property="og:description" content="בדיקה חינמית תוך דקה, בלי הרשמה. דוח בעברית עם מה לתקן.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 4 7v8c0 7.2 5.1 13.4 12 15 6.9-1.6 12-7.8 12-15V7z' fill='%234338ca'/%3E%3Cpath d='m11 16 3.5 3.5L21.5 12' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Frank+Ruhl+Libre:wght@500;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Assistant:wght@400;500;600;700&display=swap">
 <style>
-/* layout: one narrow reading column; the score sits as a stamp beside the summary; findings as a ledger with a severity rail */
+/* layout: classic SaaS landing — sticky nav, split hero with a live report card as the product shot, then trust, steps, checks, results, CTA, FAQ, footer */
 :root{
-  --bg:#f6f7f9; --paper:#ffffff; --ink:#15202b; --muted:#5b6673; --line:#dfe3e8;
-  --accent:#0f4c81; --accent-ink:#ffffff;
-  --crit:#b3261e; --high:#c7731a; --med:#8a6d1a; --low:#4a6577; --ok:#1f7a4d;
-  --display:"Frank Ruhl Libre", "Heebo", serif; --body:"Heebo", system-ui, sans-serif;
+  --brand:#4338ca; --brand-2:#6366f1; --brand-soft:#eef0ff; --brand-ink:#1e1b4b;
+  --ink:#0f172a; --text:#334155; --muted:#64748b; --line:#e5e7f0; --bg:#ffffff; --bg-2:#f7f8fc;
+  --ok:#059669; --ok-soft:#ecfdf5; --warn:#d97706; --warn-soft:#fffbeb; --crit:#dc2626; --crit-soft:#fef2f2; --low:#475569;
+  --head:"Rubik","Assistant",system-ui,sans-serif; --body:"Assistant","Rubik",system-ui,sans-serif;
+  --r:16px; --shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(30,27,75,.08);
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#0f141a; --paper:#171e26; --ink:#e8edf2; --muted:#9aa7b4; --line:#2a3440;
-  --accent:#6fb1e8; --accent-ink:#0b1420; --crit:#ef6b62; --high:#eaa04a; --med:#d9b84a; --low:#8fa6b8; --ok:#4fc38a; color-scheme:dark } }
-:root[data-theme="dark"]{
-  --bg:#0f141a; --paper:#171e26; --ink:#e8edf2; --muted:#9aa7b4; --line:#2a3440;
-  --accent:#6fb1e8; --accent-ink:#0b1420; --crit:#ef6b62; --high:#eaa04a; --med:#d9b84a; --low:#8fa6b8; --ok:#4fc38a; color-scheme:dark }
 *{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
-.wrap{max-width:760px;margin:0 auto}
-header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-block:22px 8px;border-bottom:1px solid var(--line)}
-.brand{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:.01em}
-.brand small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.8rem;margin-inline-start:8px}
-.law{font-size:.8rem;color:var(--muted);letter-spacing:.04em}
-h1{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.15;margin:34px 0 10px;text-wrap:balance}
-.lede{color:var(--muted);max-width:60ch;margin:0 0 26px;font-size:1.05rem}
-form.scan{display:flex;gap:10px;flex-wrap:wrap}
-form.scan input{flex:1 1 280px;min-width:0;font:inherit;font-size:1.05rem;padding:14px 16px;border:1.5px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);direction:ltr;text-align:left}
-form.scan input:focus{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);border-color:var(--accent)}
-button.go{font:inherit;font-weight:700;font-size:1.05rem;padding:14px 26px;border:0;border-radius:6px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
-button.go:disabled{opacity:.6;cursor:progress}
-.fine{font-size:.82rem;color:var(--muted);margin-top:10px}
-.status{margin-top:28px;color:var(--muted);font-size:.95rem}
-.status b{color:var(--ink)}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+.container{max-width:1160px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--head);color:var(--ink);margin:0;text-wrap:balance}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--head);font-weight:600;font-size:1rem;border:0;border-radius:12px;padding:14px 26px;cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s;white-space:nowrap}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 6px 16px rgba(67,56,202,.28)}
+.btn-primary:hover{background:#3730a3;transform:translateY(-1px);text-decoration:none}
+.btn-primary:disabled{opacity:.65;cursor:progress;transform:none}
+.btn-ghost{background:var(--brand-soft);color:var(--brand)}
+.btn:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid rgba(99,102,241,.45);outline-offset:2px}
 
-/* report */
-.report{margin-top:34px}
-.head{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;padding:22px;background:var(--paper);border:1px solid var(--line);border-radius:8px}
-.stamp{width:118px;height:118px;border-radius:50%;display:grid;place-content:center;text-align:center;border:6px solid var(--stamp,var(--accent));color:var(--ink);font-variant-numeric:tabular-nums}
-.stamp .n{font-family:var(--display);font-size:2.6rem;font-weight:700;line-height:1}
-.stamp .l{font-size:.7rem;color:var(--muted);letter-spacing:.06em}
-.head .t{min-width:0}
-.head .site{font-size:.85rem;color:var(--muted);direction:ltr;text-align:right;word-break:break-all}
-.head h2{margin:2px 0 6px;font-size:1.35rem;font-weight:700}
-.pill{display:inline-block;font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:999px;color:#fff;background:var(--p,var(--accent));letter-spacing:.02em}
-.head p{margin:8px 0 0;color:var(--muted)}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:12px}
-.facts div{background:var(--paper);padding:12px 14px;font-size:.9rem}
-.facts div span{display:block;color:var(--muted);font-size:.75rem;letter-spacing:.04em}
-.facts div b{font-weight:600}
-h3.sec{margin:30px 0 10px;font-size:1.05rem;font-weight:700;color:var(--muted);letter-spacing:.03em}
-.finding{display:grid;grid-template-columns:5px 1fr;gap:16px;background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:10px}
-.finding .rail{background:var(--sev)}
-.finding .body{padding:14px 16px 14px 0;min-width:0}
-.finding .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-.finding .sev{font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--sev)}
-.finding h4{margin:0;font-size:1.05rem;font-weight:700}
-.finding p{margin:6px 0 0;font-size:.95rem}
-.finding .law{margin-top:8px;font-size:.82rem;color:var(--muted)}
-.finding .fix{margin-top:8px;padding:10px 12px;background:color-mix(in srgb,var(--ok) 9%,transparent);border-radius:6px;font-size:.92rem}
+/* nav */
+.nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.nav .container{display:flex;align-items:center;justify-content:space-between;gap:20px;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--head);font-weight:800;font-size:1.3rem;color:var(--ink)}
+.logo:hover{text-decoration:none}
+.logo svg{width:32px;height:32px;flex:none}
+.nav-links{display:flex;gap:28px;font-weight:500}
+.nav-links a{color:var(--text)}
+.nav .btn{padding:10px 18px;font-size:.95rem}
+@media (max-width:820px){.nav-links{display:none}}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:radial-gradient(1200px 500px at 85% -10%,#e0e7ff 0%,rgba(224,231,255,0) 60%),radial-gradient(900px 500px at 0% 0%,#f5f3ff 0%,rgba(245,243,255,0) 55%),var(--bg)}
+.hero .container{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding-block:72px 80px}
+@media (max-width:960px){.hero .container{grid-template-columns:1fr;gap:40px;padding-block:48px 56px}}
+.badge{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 8px;font-size:.88rem;font-weight:600;color:var(--brand-ink);box-shadow:var(--shadow)}
+.badge i{display:inline-block;background:var(--brand);color:#fff;font-style:normal;border-radius:999px;padding:2px 10px;font-size:.78rem}
+.hero h1{font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.12;font-weight:800;letter-spacing:-.01em;margin:22px 0 18px}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--brand),var(--brand-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lede{font-size:1.2rem;color:var(--text);max-width:34em;margin:0 0 30px}
+.scanbox{display:flex;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 10px 30px rgba(30,27,75,.10);max-width:560px}
+.scanbox input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:1.08rem;padding:10px 14px;color:var(--ink);background:transparent;direction:ltr;text-align:left}
+.scanbox input::placeholder{color:#94a3b8}
+@media (max-width:520px){.scanbox{flex-direction:column}.scanbox .btn{width:100%}}
+.ticks{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:18px;font-size:.95rem;color:var(--muted)}
+.ticks span{display:inline-flex;align-items:center;gap:6px}
+.ticks svg{width:18px;height:18px;color:var(--ok);flex:none}
+.status{margin-top:16px;font-size:.98rem;color:var(--brand-ink);display:flex;align-items:center;gap:10px}
+.spinner{width:18px;height:18px;border:2.5px solid var(--brand-soft);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status.err{color:var(--crit)}
+
+/* product shot */
+.shot{position:relative}
+.shot .card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px rgba(30,27,75,.16);padding:22px;transform:rotate(-1.2deg)}
+.shot .float{position:absolute;z-index:2;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:10px 14px;font-size:.88rem;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.shot .f1{top:-18px;left:-10px}
+.shot .f2{bottom:-18px;right:24px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.mini-head{display:flex;align-items:center;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.ring{--v:40;--c:var(--crit);width:76px;height:76px;border-radius:50%;flex:none;display:grid;place-items:center;background:conic-gradient(var(--c) calc(var(--v)*1%),#eef0f6 0)}
+.ring b{width:60px;height:60px;border-radius:50%;background:#fff;display:grid;place-items:center;font-family:var(--head);font-size:1.4rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.mini-head .u{font-size:.85rem;color:var(--muted);direction:ltr;text-align:right}
+.mini-head h4{font-size:1.05rem;margin-top:2px}
+.mini-row{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);font-size:.93rem}
+.mini-row:last-child{border-bottom:0;padding-bottom:0}
+.mini-row .dot{margin-top:7px}
+.mini-row b{display:block;color:var(--ink);font-weight:600}
+.mini-row span{color:var(--muted);font-size:.86rem}
+@media (max-width:960px){.shot{max-width:520px;margin:0 auto;width:100%}.shot .card{transform:none}}
+
+/* sections */
+section.block{padding-block:88px}
+section.alt{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.eyebrow{display:block;color:var(--brand);font-weight:700;font-size:.9rem;letter-spacing:.04em;margin-bottom:10px}
+.sec-head{text-align:center;max-width:680px;margin:0 auto 52px}
+.sec-head h2{font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:700;line-height:1.2}
+.sec-head p{color:var(--muted);font-size:1.1rem;margin:14px 0 0}
+
+/* facts strip */
+.facts{padding-block:36px;border-bottom:1px solid var(--line)}
+.facts .container{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+@media (max-width:760px){.facts .container{grid-template-columns:1fr}}
+.fact{display:flex;gap:14px;align-items:flex-start}
+.fact .ic{width:44px;height:44px;border-radius:12px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;flex:none}
+.fact .ic svg{width:22px;height:22px}
+.fact b{display:block;font-family:var(--head);color:var(--ink);font-size:1.05rem}
+.fact span{color:var(--muted);font-size:.95rem}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+@media (max-width:860px){.steps{grid-template-columns:1fr}}
+.step{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:28px;box-shadow:var(--shadow)}
+.step .n{width:40px;height:40px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-family:var(--head);font-weight:700;margin-bottom:18px}
+.step h3{font-size:1.2rem;margin-bottom:8px}
+.step p{margin:0;color:var(--muted)}
+
+/* checks */
+.checks{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:960px){.checks{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.checks{grid-template-columns:1fr}}
+.check{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px;transition:box-shadow .2s,transform .2s}
+.check:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.check .ic{width:46px;height:46px;border-radius:12px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;margin-bottom:16px}
+.check .ic svg{width:24px;height:24px}
+.check h3{font-size:1.12rem;margin-bottom:6px}
+.check p{margin:0;color:var(--muted);font-size:.97rem}
+.check .law{display:inline-block;margin-top:12px;font-size:.8rem;font-weight:600;color:var(--brand);background:var(--brand-soft);border-radius:6px;padding:2px 8px}
+
+/* results */
+#results{scroll-margin-top:84px}
+.r-head{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:var(--shadow)}
+@media (max-width:760px){.r-head{grid-template-columns:1fr;text-align:center;justify-items:center}}
+.r-head .ring{width:120px;height:120px}
+.r-head .ring b{width:96px;height:96px;font-size:2.2rem}
+.r-head .u{color:var(--muted);direction:ltr;word-break:break-all}
+.r-head h2{font-size:1.6rem;margin:4px 0 8px}
+.r-head p{margin:0;color:var(--text)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 14px;font-weight:700;font-size:.9rem;white-space:nowrap}
+.r-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0 36px}
+.r-grid div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.r-grid span{display:block;color:var(--muted);font-size:.82rem}
+.r-grid b{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+.r-title{font-size:1.3rem;margin-bottom:14px}
+.finding{background:#fff;border:1px solid var(--line);border-inline-start:4px solid var(--sev);border-radius:14px;padding:20px 22px;margin-bottom:12px}
+.finding .top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:6px}
+.finding .tag{font-size:.78rem;font-weight:700;border-radius:6px;padding:2px 10px;color:var(--sev);background:var(--sevbg)}
+.finding h4{font-size:1.08rem}
+.finding p{margin:4px 0 0}
+.finding .lawline{margin-top:10px;font-size:.88rem;color:var(--muted)}
+.finding .fix{margin-top:12px;background:var(--ok-soft);border-radius:10px;padding:12px 14px;font-size:.96rem;color:#065f46}
 .finding .fix b{color:var(--ok)}
-.finding .ev{font-size:.78rem;color:var(--muted);margin-top:6px;direction:ltr;text-align:right;word-break:break-all}
-.clean{padding:18px;border:1px dashed var(--ok);border-radius:8px;color:var(--ok)}
+.finding .ev{margin-top:8px;font-size:.82rem;color:var(--muted);direction:ltr;text-align:right;overflow-wrap:anywhere}
+.clean{background:var(--ok-soft);border:1px solid #a7f3d0;color:#065f46;border-radius:14px;padding:20px}
+.r-note{color:var(--muted);font-size:.92rem;margin-top:18px}
 
-/* lead */
-.cta{margin-top:34px;padding:22px;background:var(--paper);border:1px solid var(--line);border-radius:8px}
-.cta h3{margin:0 0 6px;font-family:var(--display);font-size:1.4rem}
-.cta p{margin:0 0 14px;color:var(--muted)}
-.cta .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-.cta input{font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);min-width:0}
-.cta button{grid-column:1/-1;justify-self:start}
-.cta .done{color:var(--ok);font-weight:600}
-footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted);max-width:70ch}
-.example{font-size:.78rem;color:var(--muted);text-align:center;margin-top:28px}
-@media (max-width:480px){.head{grid-template-columns:1fr}.stamp{width:100px;height:100px}}
-@media (prefers-reduced-motion:no-preference){.report{animation:in .35s ease-out}@keyframes in{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}}
+/* lead CTA */
+.cta-box{background:linear-gradient(135deg,var(--brand-ink),var(--brand) 70%,var(--brand-2));color:#e0e7ff;border-radius:24px;padding:48px;display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center;box-shadow:0 30px 60px rgba(30,27,75,.25)}
+@media (max-width:900px){.cta-box{grid-template-columns:1fr;padding:32px 22px}}
+.cta-box h2{color:#fff;font-size:clamp(1.7rem,3vw,2.3rem);line-height:1.2}
+.cta-box p{margin:14px 0 0;font-size:1.08rem}
+.cta-box ul{margin:18px 0 0;padding:0;list-style:none;display:grid;gap:8px}
+.cta-box li{display:flex;gap:8px;align-items:center}
+.cta-box li svg{width:18px;height:18px;color:#a5f3fc;flex:none}
+.lead{background:#fff;border-radius:18px;padding:24px;color:var(--text)}
+.lead .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.lead .row{grid-template-columns:1fr}}
+.lead label{display:block;font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:4px}
+.lead input{width:100%;font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg-2);color:var(--ink)}
+.lead input:focus{outline:0;border-color:var(--brand-2);background:#fff;box-shadow:0 0 0 3px rgba(99,102,241,.18)}
+.lead .btn{width:100%;margin-top:16px}
+.lead .notice{font-size:.78rem;color:var(--muted);line-height:1.5;margin:12px 0 0}
+.lead .done{display:flex;gap:10px;align-items:center;background:var(--ok-soft);color:#065f46;border-radius:10px;padding:14px;font-weight:600;margin-top:14px}
+
+/* faq */
+.faq{max-width:820px;margin:0 auto;display:grid;gap:12px}
+.faq details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px 22px}
+.faq summary{cursor:pointer;list-style:none;font-family:var(--head);font-weight:600;color:var(--ink);font-size:1.08rem;padding:16px 0;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:1.4rem;color:var(--brand);transition:transform .2s;flex:none}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{margin:0 0 18px;color:var(--text)}
+
+/* footer */
+footer{background:var(--brand-ink);color:#c7d2fe;padding-block:48px 28px;font-size:.93rem}
+footer .grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px}
+@media (max-width:760px){footer .grid{grid-template-columns:1fr}}
+footer .logo{color:#fff}
+footer h4{color:#fff;font-size:1rem;margin-bottom:12px}
+footer a{color:#c7d2fe}
+footer ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+footer .legal{border-top:1px solid rgba(199,210,254,.18);margin-top:36px;padding-top:20px;font-size:.84rem;color:#a5b4fc}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div class="brand">בדיקת פרטיות לאתר<small>גרסת ניסיון</small></div>
-  <div class="law">תיקון 13 לחוק הגנת הפרטיות</div>
+
+<header class="nav">
+  <div class="container">
+    <a class="logo" href="#top" aria-label="פרטיות בטוח">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#4338ca"/></linearGradient></defs><path d="M16 2 4 7v8c0 7.2 5.1 13.4 12 15 6.9-1.6 12-7.8 12-15V7z" fill="url(#lg)"/><path d="m11 16 3.5 3.5L21.5 12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      פרטיות בטוח
+    </a>
+    <nav class="nav-links" aria-label="ניווט ראשי">
+      <a href="#how">איך זה עובד</a>
+      <a href="#checks">מה בודקים</a>
+      <a href="#faq">שאלות נפוצות</a>
+    </nav>
+    <a class="btn btn-primary" href="#top" onclick="setTimeout(()=>document.getElementById('url').focus(),300)">לבדיקה חינם</a>
+  </div>
 </header>
 
-<h1>הטופס באתר שלך יכול לעלות לך 30,000 ש"ח.</h1>
-<p class="lede">מאוגוסט 2025 כל עסק בישראל חייב לצרף הודעת יידוע לכל טופס שאוסף פרטים. באוגוסט 2026 הוטל העיצום הראשון על עסק קטן בדיוק על זה. הכנס את כתובת האתר ונבדוק תוך דקה.</p>
-
-<form class="scan" id="scanForm">
-  <input id="url" type="text" inputmode="url" autocomplete="url" placeholder="www.your-site.co.il" required>
-  <button class="go" id="goBtn" type="submit">בדוק את האתר</button>
-</form>
-<p class="fine">הבדיקה קוראת את העמוד כמו גולש רגיל, בלי להתחבר ובלי לשלוח טפסים. לא נשמרים פרטים אישיים.</p>
-
-<div class="status" id="status" hidden></div>
-<section class="report" id="report" hidden></section>
-<p class="example" id="exampleNote" hidden>זוהי דוגמה. הכנס כתובת למעלה כדי לבדוק אתר אמיתי.</p>
-
-<section class="cta" id="cta" hidden>
-  <h3>רוצה שנסדר את זה?</h3>
-  <p>נוסח יידוע לכל טופס, מדיניות פרטיות מעודכנת ותיק עמידה בחוק, מותאם לעסק שלך. השאר פרטים ונחזור אליך.</p>
-  <form id="leadForm">
-    <div class="row">
-      <input id="leadName" placeholder="שם" autocomplete="name">
-      <input id="leadBiz" placeholder="שם העסק" autocomplete="organization">
-      <input id="leadPhone" placeholder="טלפון" inputmode="tel" autocomplete="tel">
-      <input id="leadEmail" placeholder="אימייל" inputmode="email" autocomplete="email">
-      <button class="go" id="leadBtn" type="submit">חזרו אליי</button>
+<main id="top">
+<section class="hero">
+  <div class="container">
+    <div>
+      <span class="badge"><i>חדש</i> מותאם לתיקון 13 לחוק הגנת הפרטיות</span>
+      <h1>האתר של העסק שלך <em>עומד בחוק הגנת הפרטיות?</em></h1>
+      <p class="lede">מאז אוגוסט 2025 כל עסק בישראל, גם הקטן ביותר, חייב לעמוד בתיקון 13. הכניסו את כתובת האתר וקבלו תוך דקה דוח בעברית: מה תקין, מה חסר ואיך מתקנים.</p>
+      <form class="scanbox" id="scanForm" novalidate>
+        <input id="url" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="www.your-business.co.il" aria-label="כתובת האתר לבדיקה">
+        <button class="btn btn-primary" id="goBtn" type="submit">בדקו את האתר שלי</button>
+      </form>
+      <div class="status" id="status" hidden></div>
+      <div class="ticks">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>חינם לגמרי</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>בלי הרשמה</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>תוצאה תוך דקה</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>לא נוגעים באתר שלכם</span>
+      </div>
     </div>
-    <p class="fine">הפרטים נאספים כדי לחזור אליך בעניין פנייתך בלבד. המסירה מרצון; בלעדיה לא נוכל לחזור אליך. המידע לא יועבר לצד שלישי. בעל השליטה: בראנץ תעשיות שיש, tzur@baranetz.com. עומדת לך זכות לעיין במידע ולבקש את תיקונו.</p>
-    <p class="done" id="leadDone" hidden>קיבלנו. נחזור אליך בהקדם.</p>
-  </form>
+
+    <div class="shot" aria-label="דוגמה לדוח">
+      <div class="float f1"><span class="dot" style="background:var(--brand)"></span>דוגמה לדוח</div>
+      <div class="card">
+        <div class="mini-head">
+          <div class="ring" style="--v:62;--c:var(--warn)"><b>62</b></div>
+          <div>
+            <div class="u">example-business.co.il</div>
+            <h4>נמצאו 3 דברים לתקן</h4>
+          </div>
+        </div>
+        <div class="mini-row"><span class="dot" style="background:var(--crit)"></span><div><b>טופס יצירת קשר בלי הודעת יידוע</b><span>סעיף 11 · חסרים 3 מתוך 5 פרטי חובה</span></div></div>
+        <div class="mini-row"><span class="dot" style="background:var(--warn)"></span><div><b>פיקסל פייסבוק בלי גילוי במדיניות</b><span>מזהה מקוון הוא מידע אישי</span></div></div>
+        <div class="mini-row"><span class="dot" style="background:var(--warn)"></span><div><b>אין רשומת DMARC לדומיין</b><span>מאפשר התחזות למייל של העסק</span></div></div>
+        <div class="mini-row"><span class="dot" style="background:var(--ok)"></span><div><b>האתר מוצפן (HTTPS)</b><span>תקנה 14 · תקין</span></div></div>
+      </div>
+      <div class="float f2"><span class="dot" style="background:var(--brand)"></span>כולל הוראות תיקון</div>
+    </div>
+  </div>
 </section>
 
-<footer>הבדיקה אוטומטית ובודקת רק מה שנראה מבחוץ בעמוד הבית ובעמוד מדיניות הפרטיות. היא אינה ייעוץ משפטי ואינה מחליפה בדיקה של כל המאגרים, הספקים והנהלים של העסק. סכומי העיצומים לפי המדריך המקצועי של הרשות להגנת הפרטיות לתיקון 13.</footer>
+<div class="facts">
+  <div class="container">
+    <div class="fact"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><b>בתוקף מ-14.8.2025</b><span>תיקון 13 חל על כל עסק שאוסף פרטים, בלי פטור לעסקים קטנים</span></div></div>
+    <div class="fact"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v6c0 5 3.8 9.3 9 10 5.2-.7 9-5 9-10V7z"/><path d="M12 8v5M12 16h.01"/></svg></div><div><b>עיצומים כבר מוטלים</b><span>באוגוסט 2026 נקנס עסק קטן בגלל טופס מקוון בלי הודעת יידוע</span></div></div>
+    <div class="fact"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div><b>חמישה פרטי חובה ליד כל טופס</b><span>מטרה, חובה או רשות, למי יועבר, מי אתם, וזכות עיון ותיקון</span></div></div>
+  </div>
 </div>
+
+<section class="block" id="results" hidden></section>
+
+<section class="block alt" id="how">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">איך זה עובד</span>
+      <h2>שלושה צעדים, בלי טכני ובלי עורך דין</h2>
+      <p>הבדיקה קוראת את האתר כמו גולש רגיל. לא מתחברים, לא שולחים טפסים ולא משנים כלום.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>מכניסים כתובת</h3><p>רק כתובת האתר של העסק. בלי פרטים אישיים ובלי הרשמה.</p></div>
+      <div class="step"><div class="n">2</div><h3>מקבלים דוח</h3><p>ציון, רשימת ממצאים לפי חומרה, והסעיף בחוק שעליו כל ממצא נשען.</p></div>
+      <div class="step"><div class="n">3</div><h3>מתקנים</h3><p>לכל ממצא יש הוראת תיקון ברורה. רוצים שנעשה את זה בשבילכם? משאירים פרטים.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="checks">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">מה בודקים</span>
+      <h2>הנקודות שהרשות להגנת הפרטיות בודקת קודם</h2>
+      <p>כל בדיקה מבוססת על נוסח החוק, תקנות אבטחת המידע ומסמכי ההנחיה של הרשות.</p>
+    </div>
+    <div class="checks">
+      <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></div><h3>הודעת יידוע ליד כל טופס</h3><p>מטרת האיסוף, האם חובה או רשות, למי יועבר, מי אתם ואיך פונים, וזכות לעיין ולתקן.</p><span class="law">סעיף 11</span></div>
+      <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v6c0 5 3.8 9.3 9 10 5.2-.7 9-5 9-10V7z"/></svg></div><h3>מדיניות פרטיות מעודכנת</h3><p>קיימת, נגישה מהטופס, כתובה במונחים של אחרי התיקון ומפרטת עוגיות ופיקסלים.</p><span class="law">סעיפים 3, 11</span></div>
+      <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div><h3>שדות רגישים בטפסים</h3><p>תעודת זהות, תאריך לידה, פרטי ילדים, מידע בריאותי או פיננסי. שם העיצום כפול.</p><span class="law">מידע בעל רגישות מיוחדת</span></div>
+      <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/></svg></div><h3>כלי מעקב ופיקסלים</h3><p>פייסבוק, גוגל, טיקטוק, Hotjar ועוד. כל אחד מהם אוסף מידע על הגולשים שלכם.</p><span class="law">מזהה מקוון</span></div>
+      <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h3>הצפנה ואבטחת האתר</h3><p>HTTPS, כותרות אבטחה, וגרסאות מערכת חשופות שמקלות על תוקפים.</p><span class="law">תקנות 13, 14</span></div>
+      <div class="check"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg></div><h3>הגנה מהתחזות במייל</h3><p>רשומות SPF ו-DMARC שמונעות ממישהו לשלוח מיילים בשם העסק שלכם.</p><span class="law">אבטחת מידע</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" id="lead">
+  <div class="container">
+    <div class="cta-box">
+      <div>
+        <h2>רוצים שנסדר את זה בשבילכם?</h2>
+        <p>אנחנו מכינים לעסק שלכם את כל מה שהחוק דורש, מותאם אליכם ובעברית פשוטה.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>נוסח יידוע לכל טופס באתר</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>מדיניות פרטיות מעודכנת לתיקון 13</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>מסמך הגדרות מאגר ונוהל אבטחת מידע</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>תיק מסודר להצגה אם הרשות פונה</li>
+        </ul>
+      </div>
+      <form class="lead" id="leadForm" novalidate>
+        <div class="row">
+          <div><label for="leadName">שם מלא</label><input id="leadName" autocomplete="name"></div>
+          <div><label for="leadBiz">שם העסק</label><input id="leadBiz" autocomplete="organization"></div>
+          <div><label for="leadPhone">טלפון</label><input id="leadPhone" inputmode="tel" autocomplete="tel" dir="ltr"></div>
+          <div><label for="leadEmail">אימייל</label><input id="leadEmail" inputmode="email" autocomplete="email" dir="ltr"></div>
+        </div>
+        <button class="btn btn-primary" id="leadBtn" type="submit">חזרו אליי</button>
+        <div class="done" id="leadDone" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>קיבלנו. נחזור אליכם בהקדם.</div>
+        <p class="notice">הפרטים נאספים כדי לחזור אליכם בעניין הפנייה בלבד. המסירה אינה חובה, אך בלעדיה לא נוכל לחזור אליכם. המידע לא יועבר לצד שלישי מלבד ספקי האחסון שלנו. בעל השליטה במאגר: צור בראנץ, tzur@baranetz.com. עומדת לכם זכות לעיין במידע ולבקש את תיקונו לפי סעיפים 13 ו-14 לחוק הגנת הפרטיות.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="faq">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">שאלות נפוצות</span>
+      <h2>מה שבעלי עסקים שואלים אותנו</h2>
+    </div>
+    <div class="faq">
+      <details><summary>אני עסק קטן. החוק באמת חל עליי?</summary><p>כן. תיקון 13 לא פוטר עסקים קטנים. כל עסק שאוסף פרטים של אנשים, למשל בטופס יצירת קשר באתר, חייב להציג הודעת יידוע ולשמור על המידע. היקף החובות הנוספות תלוי בסוג המידע ובכמותו.</p></details>
+      <details><summary>מה הבדיקה עושה לאתר שלי?</summary><p>שום דבר. היא קוראת את עמוד הבית ואת עמוד מדיניות הפרטיות כמו גולש רגיל, ובודקת רשומות DNS ציבוריות. לא מתחברים, לא שולחים טפסים ולא מנסים לפרוץ.</p></details>
+      <details><summary>אם הציון שלי טוב, אני מכוסה?</summary><p>לא בהכרח. הבדיקה רואה רק את מה שגלוי מבחוץ. החוק דורש גם דברים פנימיים, כמו מסמך הגדרות מאגר, נוהל אבטחה, הסכמים עם ספקים וטיפול בבקשות עיון. ציון טוב הוא התחלה טובה, לא אישור עמידה בחוק.</p></details>
+      <details><summary>כמה עולה העיצום על טופס בלי הודעת יידוע?</summary><p>לפי החוק: 50 ש"ח לכל אדם שמסר פרטים, ולא פחות מ-30,000 ש"ח להפרה. לעסקים זעירים וקטנים יש תקרות, ובכל מקרה העיצום לא יעלה על 5% מהמחזור השנתי. בנוסף, כל לקוח רשאי לתבוע פיצוי של עד 10,000 ש"ח בלי להוכיח נזק.</p></details>
+      <details><summary>מה אתם עושים עם הכתובת שהכנסתי?</summary><p>שומרים את תוצאות הבדיקה כדי לשפר את השירות ולספור כמה אתרים נבדקו. אנחנו לא שומרים פרטים מזהים על מי שביצע את הבדיקה. אם השארתם פרטים בטופס, נשתמש בהם רק כדי לחזור אליכם.</p></details>
+      <details><summary>זה ייעוץ משפטי?</summary><p>לא. הבדיקה היא כלי אוטומטי שמבוסס על נוסח החוק והנחיות הרשות להגנת הפרטיות, ונועד לעזור לכם לזהות פערים. להחלטות משפטיות פנו לעורך דין.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="grid">
+      <div>
+        <div class="logo"><svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><path d="M16 2 4 7v8c0 7.2 5.1 13.4 12 15 6.9-1.6 12-7.8 12-15V7z" fill="#6366f1"/><path d="m11 16 3.5 3.5L21.5 12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>פרטיות בטוח</div>
+        <p style="margin:12px 0 0;max-width:30em">כלים פשוטים לעסקים קטנים בישראל לעמידה בחוק הגנת הפרטיות.</p>
+      </div>
+      <div>
+        <h4>האתר</h4>
+        <ul><li><a href="#top">בדיקה חינם</a></li><li><a href="#how">איך זה עובד</a></li><li><a href="#checks">מה בודקים</a></li><li><a href="#faq">שאלות נפוצות</a></li></ul>
+      </div>
+      <div>
+        <h4>יצירת קשר</h4>
+        <ul><li>צור בראנץ</li><li dir="ltr" style="text-align:right">tzur@baranetz.com</li><li><a href="#lead">השארת פרטים</a></li></ul>
+      </div>
+    </div>
+    <div class="legal">הבדיקה אוטומטית ואינה ייעוץ משפטי. היא בודקת רק את מה שגלוי בעמוד הבית ובעמוד מדיניות הפרטיות, ואינה מחליפה בדיקה של כל המאגרים, הספקים והנהלים של העסק. סכומי העיצומים לפי המדריך המקצועי של הרשות להגנת הפרטיות לתיקון 13 (2025).</div>
+  </div>
+</footer>
 
 <script>
 const API = "https://bevtzoskhspkhekkytus.supabase.co/functions/v1/scan";
-const SEV = {critical:["קריטי","var(--crit)"],high:["גבוה","var(--high)"],medium:["בינוני","var(--med)"],low:["נמוך","var(--low)"],info:["מידע","var(--low)"]};
+const SEV = {
+  critical:["קריטי","var(--crit)","var(--crit-soft)"], high:["חשוב","var(--warn)","var(--warn-soft)"],
+  medium:["בינוני","var(--warn)","var(--warn-soft)"], low:["המלצה","var(--low)","#f1f5f9"], info:["מידע","var(--low)","#f1f5f9"]
+};
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const $ = id => document.getElementById(id);
 let currentScanId = null;
 
-function render(r, isExample){
-  const stamp = r.score >= 80 ? "var(--ok)" : r.score >= 50 ? "var(--high)" : "var(--crit)";
-  const pill = r.exposure === "גבוהה" ? "var(--crit)" : r.exposure === "בינונית" ? "var(--high)" : "var(--ok)";
+function render(r){
+  const c = r.score >= 80 ? "var(--ok)" : r.score >= 50 ? "var(--warn)" : "var(--crit)";
+  const [pc, pb] = r.exposure === "גבוהה" ? ["var(--crit)","var(--crit-soft)"] : r.exposure === "בינונית" ? ["var(--warn)","var(--warn-soft)"] : ["var(--ok)","var(--ok-soft)"];
   const yes = v => v ? "כן" : "לא";
-  let h = `<div class="head" style="--stamp:${stamp}">
-    <div class="stamp"><div class="n">${r.score}</div><div class="l">מתוך 100</div></div>
-    <div class="t"><div class="site">${esc(r.finalUrl)}</div>
-      <h2>חשיפה לעיצום: <span class="pill" style="--p:${pill}">${esc(r.exposure)}</span></h2>
-      <p>${esc(r.summary)}</p></div></div>
-  <div class="facts">
-    <div><span>טפסים שנמצאו</span><b>${r.meta.formsCount}</b></div>
-    <div><span>מדיניות פרטיות</span><b>${yes(r.privacyPolicy.found)}</b></div>
-    <div><span>כלי מעקב</span><b>${r.trackers.length ? esc(r.trackers.join(", ")) : "לא נמצאו"}</b></div>
-    <div><span>הצפנה (HTTPS)</span><b>${yes(r.https.ok)}</b></div>
-    <div><span>SPF / DMARC</span><b>${yes(r.dns.spf)} / ${yes(r.dns.dmarc)}</b></div>
-    ${r.meta.cms ? `<div><span>פלטפורמה</span><b>${esc(r.meta.cms)}</b></div>` : ""}
-  </div>`;
-  h += `<h3 class="sec">ממצאים (${r.findings.length})</h3>`;
-  if (!r.findings.length) h += `<div class="clean">לא נמצאו ליקויים בבדיקה החיצונית. זה לא אומר שהעסק עומד בכל החוק, אבל זו התחלה טובה.</div>`;
-  for (const f of r.findings) {
-    const [name, color] = SEV[f.severity] || SEV.info;
-    h += `<article class="finding" style="--sev:${color}"><div class="rail"></div><div class="body">
-      <div class="top"><span class="sev">${name}</span><h4>${esc(f.title)}</h4></div>
-      <p>${esc(f.detail)}</p>
-      <div class="law">${esc(f.law)}</div>
-      <div class="fix"><b>מה לעשות:</b> ${esc(f.fix)}</div>
-      ${f.evidence ? `<div class="ev">${esc(f.evidence)}</div>` : ""}</div></article>`;
+  const toFix = r.findings.filter(f => f.severity !== "info").length;
+  let h = `<div class="container">
+    <div class="r-head">
+      <div class="ring" style="--v:${r.score};--c:${c}"><b>${r.score}</b></div>
+      <div><div class="u">${esc(r.finalUrl)}</div>
+        <h2>${toFix ? `נמצאו ${toFix} דברים לבדוק ולתקן` : "לא נמצאו ליקויים בבדיקה החיצונית"}</h2>
+        <p>${esc(r.summary)}</p></div>
+      <span class="pill" style="color:${pc};background:${pb}">חשיפה לעיצום: ${esc(r.exposure)}</span>
+    </div>
+    <div class="r-grid">
+      <div><span>טפסים שנמצאו</span><b>${r.meta.formsCount}</b></div>
+      <div><span>מדיניות פרטיות</span><b>${yes(r.privacyPolicy.found)}</b></div>
+      <div><span>כלי מעקב</span><b>${r.trackers.length ? esc(r.trackers.join(", ")) : "לא נמצאו"}</b></div>
+      <div><span>הצפנה (HTTPS)</span><b>${yes(r.https.ok)}</b></div>
+      <div><span>הגנה מהתחזות במייל</span><b>${r.dns.spf && r.dns.dmarc ? "מלאה" : r.dns.spf || r.dns.dmarc ? "חלקית" : "חסרה"}</b></div>
+      ${r.meta.cms ? `<div><span>פלטפורמה</span><b>${esc(r.meta.cms)}</b></div>` : ""}
+    </div>`;
+  if (r.findings.length) {
+    h += `<h3 class="r-title">הממצאים, מהחשוב ביותר</h3>`;
+    for (const f of r.findings) {
+      const [name, col, bg] = SEV[f.severity] || SEV.info;
+      h += `<article class="finding" style="--sev:${col};--sevbg:${bg}">
+        <div class="top"><span class="tag">${name}</span><h4>${esc(f.title)}</h4></div>
+        <p>${esc(f.detail)}</p>
+        <div class="lawline">${esc(f.law)}</div>
+        <div class="fix"><b>מה לעשות:</b> ${esc(f.fix)}</div>
+        ${f.evidence ? `<div class="ev">${esc(f.evidence)}</div>` : ""}
+      </article>`;
+    }
+  } else {
+    h += `<div class="clean">לא נמצאו ליקויים במה שגלוי מבחוץ. זו התחלה טובה, אבל החוק דורש גם מסמכים ונהלים פנימיים שבדיקה חיצונית לא רואה.</div>`;
   }
-  const rep = document.getElementById("report");
-  rep.innerHTML = h; rep.hidden = false;
-  document.getElementById("exampleNote").hidden = !isExample;
-  document.getElementById("cta").hidden = isExample;
+  h += `<p class="r-note">הבדיקה אוטומטית ובודקת רק את מה שגלוי מבחוץ. <a href="#lead">רוצים שנעבור על הכל ונסדר את זה בשבילכם?</a></p></div>`;
+  const s = $("results"); s.innerHTML = h; s.hidden = false;
+  s.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-document.getElementById("scanForm").addEventListener("submit", async e => {
+$("scanForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const url = document.getElementById("url").value.trim();
-  const btn = document.getElementById("goBtn"), st = document.getElementById("status");
-  btn.disabled = true; st.hidden = false; st.innerHTML = "בודק את <b>" + esc(url) + "</b>… קורא את העמוד, מחפש טפסים, מדיניות פרטיות ורשומות DNS.";
-  document.getElementById("report").hidden = true; document.getElementById("cta").hidden = true; document.getElementById("exampleNote").hidden = true;
+  const url = $("url").value.trim(), btn = $("goBtn"), st = $("status");
+  if (!url) { $("url").focus(); return; }
+  btn.disabled = true; btn.textContent = "בודקים…";
+  st.hidden = false; st.className = "status";
+  st.innerHTML = `<span class="spinner"></span><span>סורקים את <b dir="ltr">${esc(url)}</b>: טפסים, מדיניות פרטיות, פיקסלים והצפנה</span>`;
   try {
     const res = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url }) });
     const r = await res.json();
-    if (!res.ok || r.error) { st.textContent = r.error || "משהו השתבש. נסה שוב."; return; }
-    currentScanId = r.scan_id; st.hidden = true; render(r, false);
-    document.getElementById("report").scrollIntoView({ behavior: "smooth", block: "start" });
-  } catch { st.textContent = "לא הצלחנו להתחבר לשרת הבדיקה. נסה שוב בעוד רגע."; }
-  finally { btn.disabled = false; }
+    if (!res.ok || r.error) { st.className = "status err"; st.textContent = r.error || "משהו השתבש. נסו שוב."; return; }
+    if (r.findings?.[0]?.id === "unreachable") { st.className = "status err"; st.textContent = "לא הצלחנו לטעון את האתר. בדקו שהכתובת נכונה ושהאתר פעיל."; return; }
+    currentScanId = r.scan_id; st.hidden = true; render(r);
+  } catch { st.className = "status err"; st.textContent = "לא הצלחנו להתחבר לשרת הבדיקה. נסו שוב בעוד רגע."; }
+  finally { btn.disabled = false; btn.textContent = "בדקו את האתר שלי"; }
 });
 
-document.getElementById("leadForm").addEventListener("submit", async e => {
+$("leadForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const g = id => document.getElementById(id).value.trim();
+  const g = id => $(id).value.trim();
   const body = { action: "lead", scan_id: currentScanId, name: g("leadName"), business: g("leadBiz"), phone: g("leadPhone"), email: g("leadEmail") };
-  if (!body.phone && !body.email) { document.getElementById("leadPhone").focus(); return; }
-  const btn = document.getElementById("leadBtn"); btn.disabled = true;
+  if (!body.phone && !body.email) { $("leadPhone").focus(); $("leadPhone").style.borderColor = "var(--crit)"; return; }
+  const btn = $("leadBtn"); btn.disabled = true; btn.textContent = "שולחים…";
   try {
     const res = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-    if (res.ok) { document.getElementById("leadDone").hidden = false; btn.hidden = true; }
-    else btn.disabled = false;
-  } catch { btn.disabled = false; }
+    if (res.ok) { $("leadDone").hidden = false; btn.hidden = true; }
+    else { btn.disabled = false; btn.textContent = "חזרו אליי"; }
+  } catch { btn.disabled = false; btn.textContent = "חזרו אליי"; }
 });
-
-// דוגמה במנוחה: מה שרואים לפני שמכניסים כתובת
-render({
-  finalUrl: "https://example-business.co.il", score: 40, exposure: "גבוהה",
-  summary: "נמצאו 1 טפסים. 1 מהם בלי הודעת יידוע מלאה. אין מדיניות פרטיות. 2 כלי מעקב.",
-  meta: { formsCount: 1, cms: "WordPress + Elementor" }, privacyPolicy: { found: false }, trackers: ["Meta Pixel", "Google Analytics"],
-  https: { ok: true }, dns: { spf: true, dmarc: false },
-  findings: [
-    { severity: "critical", title: "טופס 1: חסרה הודעת יידוע מלאה", detail: "ליד הטופס לא נמצאו הפרטים: חובה/רשות ותוצאת אי-הסכמה, למי יימסר המידע, זכות עיון ותיקון.", law: "סעיף 11 לחוק הגנת הפרטיות. עיצום: 50 ש\"ח לאדם, מינימום 30,000 ש\"ח.", fix: "להוסיף מתחת לכפתור השליחה 2–3 שורות יידוע עם קישור למדיניות הפרטיות.", evidence: "שדות: fullname, phone, email" },
-    { severity: "critical", title: "לא נמצאה מדיניות פרטיות", detail: "לא נמצא עמוד מדיניות פרטיות באתר.", law: "סעיף 11; הנחיית הרשות — חובת יידוע.", fix: "לפרסם מדיניות פרטיות בעברית עם 5 פרטי היידוע ופירוט פיקסלים." },
-    { severity: "medium", title: "אין רשומת DMARC", detail: "אין מדיניות שמורה לשרתים לדחות מיילים מזויפים בשם הדומיין.", law: "לא חובה בתקנות, אבל מונע התחזות למייל העסק.", fix: "להוסיף רשומת _dmarc." }
-  ]
-}, true);
 </script>
 </body>
 </html>
