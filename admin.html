@@ -401,7 +401,10 @@ function howToEl(h){
   const copyBlock = c => {
     const pre = el("pre", { class: "cpre" + (c.ltr ? " ltr" : "") }, c.text);
     const btn = el("button", { class: "btn ghost sm", onclick: async () => {
-      try { await navigator.clipboard.writeText(c.text); btn.textContent = "הועתק ✓"; } catch { btn.textContent = "לא הועתק"; }
+      const ta = document.createElement("textarea"); ta.value = c.text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;left:-9999px;opacity:0";
+      document.body.append(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch {} ta.remove();
+      if (!ok) { try { await navigator.clipboard.writeText(c.text); ok = true; } catch {} }
+      btn.textContent = ok ? "הועתק ✓" : "לא הועתק";
       setTimeout(() => btn.textContent = "העתקה", 1500);
     }}, "העתקה");
     return el("div", { class: "cbox" }, el("div", { class: "chead" }, el("b", null, c.label), btn), pre);
