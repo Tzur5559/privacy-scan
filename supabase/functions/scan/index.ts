@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { scan, staticSafe } from "./engine.ts";
+import { handleAdmin, notifyLead } from "./admin.ts";
 
 // רק הדף שלנו רשאי לשלוח לידים מדפדפן. סריקה פתוחה לכולם (זה המוצר).
 const ALLOWED_ORIGINS = ["https://tzur5559.github.io"];
@@ -15,7 +16,7 @@ const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SE
 function cors(origin: string | null) {
   return {
     "Access-Control-Allow-Origin": origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
-    "Access-Control-Allow-Headers": "content-type",
+    "Access-Control-Allow-Headers": "content-type, authorization",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Vary": "Origin",
     "X-Content-Type-Options": "nosniff",
@@ -61,6 +62,13 @@ Deno.serve(async (req) => {
   const ipHash = await sha(ip + (Deno.env.get("IP_SALT") ?? "pscan-default-salt"));
 
   try {
+    // ---------- ניהול ----------
+    if (typeof body.action === "string" && body.action.startsWith("admin_")) {
+      if (req.method !== "POST" || !origin || !ALLOWED_ORIGINS.includes(origin)) return json({ error: "לא מורשה" }, 403);
+      const out = await handleAdmin(db, req, body, ipHash);
+      return json(out.body, out.status);
+    }
+
     // ---------- ליד ----------
     if (body.action === "lead") {
       if (!origin || !ALLOWED_ORIGINS.includes(origin)) return json({ error: "לא מורשה" }, 403);
@@ -70,11 +78,10 @@ Deno.serve(async (req) => {
       if (!email && !phone) return json({ error: "צריך אימייל או טלפון" }, 400);
       if (await countSince("pscan_leads", ipHash, 60) >= LEADS_PER_HOUR) return json({ error: "כבר קיבלנו את הפרטים שלך. נחזור אליך." }, 429);
       const scanId = typeof body.scan_id === "string" && UUID.test(body.scan_id) ? body.scan_id : null;
-      const { error } = await db.from("pscan_leads").insert({
-        scan_id: scanId, name: clean(body.name, 120), business: clean(body.business, 200),
-        phone, email, note: clean(body.note, 1000), ip_hash: ipHash,
-      });
+      const lead = { name: clean(body.name, 120), business: clean(body.business, 200), phone, email, note: clean(body.note, 1000) };
+      const { error } = await db.from("pscan_leads").insert({ scan_id: scanId, ...lead, ip_hash: ipHash });
       if (error) { console.error("lead insert", error.code); return json({ error: "לא הצלחנו לשמור. נסו שוב." }, 500); }
+      await notifyLead(db, lead, scanId);
       return json({ ok: true });
     }
 

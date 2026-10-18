@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://bevtzoskhspkhekkytus.supabase.co; form-action 'none'; base-uri 'none'; frame-ancestors 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ניהול | פרטיות בטוח</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 4 7v8c0 7.2 5.1 13.4 12 15 6.9-1.6 12-7.8 12-15V7z' fill='%234338ca'/%3E%3Cpath d='m11 16 3.5 3.5L21.5 12' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+:root{
+  --brand:#4338ca; --brand-soft:#eef0ff; --ink:#0f172a; --text:#334155; --muted:#64748b; --line:#e5e7f0;
+  --bg:#f7f8fc; --card:#fff; --ok:#059669; --ok-soft:#ecfdf5; --warn:#b45309; --warn-soft:#fffbeb; --crit:#dc2626; --crit-soft:#fef2f2;
+  --head:"Rubik","Assistant",system-ui,sans-serif; --body:"Assistant","Rubik",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:var(--head);color:var(--ink);margin:0}
+button,input,select,textarea{font:inherit}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:10px;padding:10px 18px;font-family:var(--head);font-weight:600;cursor:pointer;background:var(--brand);color:#fff}
+.btn:disabled{opacity:.6;cursor:progress}
+.btn.ghost{background:var(--brand-soft);color:var(--brand)}
+.btn.danger{background:var(--crit-soft);color:var(--crit)}
+.btn.sm{padding:6px 12px;font-size:.9rem}
+input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);width:100%}
+input:focus,select:focus,textarea:focus,.btn:focus-visible{outline:3px solid rgba(99,102,241,.35);outline-offset:1px}
+label{display:block;font-weight:600;color:var(--ink);margin:14px 0 6px}
+.hint{color:var(--muted);font-size:.9rem;margin:4px 0 0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+/* login */
+.login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.login .card{width:100%;max-width:400px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--head);font-weight:700;color:var(--ink);font-size:1.15rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(30,27,75,.06)}
+.msg{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:.95rem}
+.msg.err{background:var(--crit-soft);color:var(--crit)}
+.msg.ok{background:var(--ok-soft);color:var(--ok)}
+.msg.info{background:var(--brand-soft);color:var(--brand)}
+/* app */
+header.top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:60px}
+.who{color:var(--muted);font-size:.9rem;display:flex;align-items:center;gap:10px}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:20px 0;overflow-x:auto}
+nav.tabs button{background:none;border:0;padding:12px 16px;font-family:var(--head);font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--brand);border-color:var(--brand)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat .n{font-family:var(--head);font-size:2rem;font-weight:700;color:var(--ink)}
+.stat .l{color:var(--muted);font-size:.9rem}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.toolbar select,.toolbar input{width:auto;min-width:180px}
+.table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.table th,.table td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.95rem}
+.table th{background:#fafbff;color:var(--muted);font-weight:600;font-size:.85rem}
+.table tr:last-child td{border-bottom:0}
+.table tr.click{cursor:pointer}
+.table tr.click:hover td{background:#fafbff}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:600}
+.pill.new{background:var(--brand-soft);color:var(--brand)}
+.pill.contacted{background:var(--warn-soft);color:var(--warn)}
+.pill.customer{background:var(--ok-soft);color:var(--ok)}
+.pill.not_relevant{background:#f1f5f9;color:var(--muted)}
+.score{font-family:var(--head);font-weight:700}
+.score.good{color:var(--ok)} .score.mid{color:var(--warn)} .score.bad{color:var(--crit)}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.lead-edit{display:grid;grid-template-columns:200px 1fr auto;gap:10px;align-items:start;margin-top:8px}
+.lead-edit textarea{min-height:42px;resize:vertical}
+dialog{border:0;border-radius:16px;padding:0;width:min(760px,calc(100vw - 32px));max-height:85vh;box-shadow:0 24px 64px rgba(15,23,42,.25)}
+dialog::backdrop{background:rgba(15,23,42,.45)}
+dialog .dh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff}
+dialog .db{padding:16px 20px;overflow:auto}
+.finding{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.finding h4{margin:0 0 4px;font-family:var(--head);color:var(--ink)}
+.finding p{margin:4px 0;font-size:.93rem}
+.sev{font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:999px;margin-inline-start:6px}
+.sev.critical,.sev.high{background:var(--crit-soft);color:var(--crit)}
+.sev.medium{background:var(--warn-soft);color:var(--warn)}
+.sev.low,.sev.info{background:#f1f5f9;color:var(--muted)}
+.switch{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:600;color:var(--ink)}
+.switch input{width:20px;height:20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+@media (max-width:760px){
+  .stats{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+  .lead-edit{grid-template-columns:1fr}
+  .table thead{display:none}
+  .table,.table tbody,.table tr,.table td{display:block;width:100%}
+  .table tr{border-bottom:1px solid var(--line);padding:6px 0}
+  .table td{border:0;padding:4px 12px}
+  .table td[data-l]::before{content:attr(data-l) ": ";color:var(--muted);font-size:.85rem}
+}
+</style>
+</head>
+<body>
+
+<!-- כניסה -->
+<section class="login" id="login">
+  <div class="card">
+    <div class="brand"><svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.2 5.1 13.4 12 15 6.9-1.6 12-7.8 12-15V7z" fill="#4338ca"/><path d="m11 16 3.5 3.5L21.5 12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>פרטיות בטוח · ניהול</div>
+    <div id="step-email">
+      <label for="email">אימייל של מנהל</label>
+      <input id="email" type="email" autocomplete="email" dir="ltr" placeholder="name@example.com">
+      <p class="hint">נשלח אליך קוד כניסה חד-פעמי. אין סיסמה.</p>
+      <div class="row-actions"><button class="btn" id="btn-send">שליחת קוד</button></div>
+    </div>
+    <div id="step-code" hidden>
+      <label for="code">הקוד שקיבלת במייל</label>
+      <input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" dir="ltr" placeholder="000000">
+      <p class="hint">הקוד בתוקף 10 דקות.</p>
+      <div class="row-actions"><button class="btn" id="btn-verify">כניסה</button><button class="btn ghost" id="btn-back">חזרה</button></div>
+    </div>
+    <div id="login-msg" class="msg" hidden></div>
+  </div>
+</section>
+
+<!-- מערכת -->
+<div id="app" hidden>
+  <header class="top"><div class="wrap">
+    <div class="brand"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.2 5.1 13.4 12 15 6.9-1.6 12-7.8 12-15V7z" fill="#4338ca"/><path d="m11 16 3.5 3.5L21.5 12" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>פרטיות בטוח · ניהול</div>
+    <div class="who"><span id="me" class="ltr"></span><button class="btn ghost sm" id="btn-logout">יציאה</button></div>
+  </div></header>
+
+  <main class="wrap">
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="overview" aria-selected="true">סקירה</button>
+      <button role="tab" data-tab="leads" aria-selected="false">לידים</button>
+      <button role="tab" data-tab="scans" aria-selected="false">סריקות</button>
+      <button role="tab" data-tab="settings" aria-selected="false">הגדרות</button>
+    </nav>
+    <div id="app-msg" class="msg" hidden></div>
+
+    <section data-panel="overview">
+      <div class="stats">
+        <div class="card stat"><div class="n" id="s-leadsNew">–</div><div class="l">לידים חדשים שלא טופלו</div></div>
+        <div class="card stat"><div class="n" id="s-leads">–</div><div class="l">לידים בסך הכול</div></div>
+        <div class="card stat"><div class="n" id="s-scansWeek">–</div><div class="l">סריקות ב-7 ימים</div></div>
+        <div class="card stat"><div class="n" id="s-scans">–</div><div class="l">סריקות בסך הכול</div></div>
+      </div>
+      <div id="mail-warn" class="msg err" hidden>שליחת מיילים עוד לא מחוברת, ולכן התראות על לידים לא נשלחות. ההוראות נמצאות בלשונית "הגדרות".</div>
+    </section>
+
+    <section data-panel="leads" hidden>
+      <div class="toolbar">
+        <select id="lead-filter" aria-label="סינון לפי סטטוס">
+          <option value="">כל הלידים</option>
+          <option value="new">חדש</option>
+          <option value="contacted">יצרנו קשר</option>
+          <option value="customer">לקוח</option>
+          <option value="not_relevant">לא רלוונטי</option>
+        </select>
+        <button class="btn ghost sm" id="btn-leads-csv">הורדה לאקסל (CSV)</button>
+      </div>
+      <div id="leads"></div>
+    </section>
+
+    <section data-panel="scans" hidden>
+      <div class="toolbar"><input id="scan-q" placeholder="חיפוש לפי דומיין" dir="ltr"><button class="btn ghost sm" id="btn-scan-q">חיפוש</button></div>
+      <div id="scans"></div>
+    </section>
+
+    <section data-panel="settings" hidden>
+      <div class="grid2">
+        <div class="card">
+          <h3>התראות על לידים</h3>
+          <div class="switch"><input type="checkbox" id="notify_enabled"><label for="notify_enabled" style="margin:0">לשלוח מייל על כל ליד חדש</label></div>
+          <label for="notify_emails">לאילו כתובות לשלוח</label>
+          <textarea id="notify_emails" dir="ltr" rows="3" placeholder="one@example.com"></textarea>
+          <p class="hint">כתובת אחת בכל שורה, עד 10.</p>
+          <div class="row-actions"><button class="btn ghost sm" id="btn-test">שליחת מייל בדיקה</button></div>
+        </div>
+        <div class="card">
+          <h3>שולח המיילים</h3>
+          <label for="sender_email">כתובת השולח</label>
+          <input id="sender_email" dir="ltr">
+          <p class="hint">הכתובת חייבת להיות מאומתת אצל ספק המיילים.</p>
+          <label for="sender_name">שם השולח</label>
+          <input id="sender_name">
+          <p class="hint" id="provider-line"></p>
+        </div>
+        <div class="card">
+          <h3>מי יכול להיכנס למסך הזה</h3>
+          <label for="admin_emails">כתובות מנהלים</label>
+          <textarea id="admin_emails" dir="ltr" rows="3"></textarea>
+          <p class="hint">רק לכתובות האלה יישלח קוד כניסה. כתובת אחת בכל שורה.</p>
+        </div>
+        <div class="card">
+          <h3>עדכון אחרון</h3>
+          <p class="hint" id="settings-meta">–</p>
+        </div>
+      </div>
+      <div class="row-actions"><button class="btn" id="btn-save">שמירת הגדרות</button></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg"><div class="dh"><h3 id="dlg-title"></h3><button class="btn ghost sm" id="dlg-close">סגירה</button></div><div class="db" id="dlg-body"></div></dialog>
+
+<script>
+"use strict";
+const API = "https://bevtzoskhspkhekkytus.supabase.co/functions/v1/scan";
+const $ = s => document.querySelector(s);
+const STATUS = { new: "חדש", contacted: "יצרנו קשר", customer: "לקוח", not_relevant: "לא רלוונטי" };
+const SEV = { critical: "קריטי", high: "גבוה", medium: "בינוני", low: "נמוך", info: "מידע" };
+
+const store = {
+  get(k){ try { return sessionStorage.getItem(k); } catch { return null; } },
+  set(k,v){ try { sessionStorage.setItem(k,v); } catch {} },
+  del(k){ try { sessionStorage.removeItem(k); } catch {} },
+};
+let token = store.get("pscan_admin");
+
+function el(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  if (attrs) for (const [k,v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v);
+  }
+  for (const k of kids) if (k != null) n.append(k instanceof Node ? k : String(k));
+  return n;
+}
+function msg(box, text, kind){ box.className = "msg " + kind; box.textContent = text; box.hidden = !text; }
+const fmtDate = s => new Date(s).toLocaleString("he-IL", { day:"2-digit", month:"2-digit", year:"2-digit", hour:"2-digit", minute:"2-digit" });
+const scoreEl = n => el("span", { class: "score " + (n >= 80 ? "good" : n >= 50 ? "mid" : "bad") }, n == null ? "–" : n);
+
+async function call(action, data = {}, auth = true){
+  const headers = { "content-type": "application/json" };
+  if (auth && token) headers.authorization = "Bearer " + token;
+  let r;
+  try { r = await fetch(API, { method: "POST", headers, body: JSON.stringify({ action, ...data }) }); }
+  catch { throw new Error("אין חיבור לשרת. בדקו את האינטרנט ונסו שוב."); }
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401 && auth) { logout(true); throw new Error(j.error || "צריך להתחבר מחדש"); }
+  if (!r.ok) throw new Error(j.error || "שגיאה");
+  return j;
+}
+
+/* ---------- כניסה ---------- */
+const lm = $("#login-msg");
+$("#btn-send").addEventListener("click", async e => {
+  const email = $("#email").value.trim();
+  if (!email) return msg(lm, "הכניסו אימייל", "err");
+  e.target.disabled = true;
+  try {
+    const j = await call("admin_request_code", { email }, false);
+    $("#step-email").hidden = true; $("#step-code").hidden = false; $("#code").focus();
+    msg(lm, j.message, "info");
+  } catch (err) { msg(lm, err.message, "err"); }
+  e.target.disabled = false;
+});
+$("#btn-back").addEventListener("click", () => { $("#step-code").hidden = true; $("#step-email").hidden = false; msg(lm, "", "info"); });
+$("#code").addEventListener("keydown", e => { if (e.key === "Enter") $("#btn-verify").click(); });
+$("#email").addEventListener("keydown", e => { if (e.key === "Enter") $("#btn-send").click(); });
+$("#btn-verify").addEventListener("click", async e => {
+  e.target.disabled = true;
+  try {
+    const j = await call("admin_verify", { email: $("#email").value.trim(), code: $("#code").value.trim() }, false);
+    token = j.token; store.set("pscan_admin", token);
+    $("#code").value = "";
+    start();
+  } catch (err) { msg(lm, err.message, "err"); }
+  e.target.disabled = false;
+});
+function logout(expired){
+  token = null; store.del("pscan_admin");
+  $("#app").hidden = true; $("#login").hidden = false;
+  $("#step-code").hidden = true; $("#step-email").hidden = false;
+  msg(lm, expired ? "החיבור פג. התחברו שוב." : "", "info");
+}
+$("#btn-logout").addEventListener("click", async () => { try { await call("admin_logout"); } catch {} logout(false); });
+
+/* ---------- לשוניות ---------- */
+const loaders = { overview: loadOverview, leads: loadLeads, scans: loadScans, settings: loadSettings };
+document.querySelectorAll("nav.tabs button").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+function showTab(name){
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
+  document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== name);
+  msg($("#app-msg"), "", "info");
+  loaders[name]().catch(err => msg($("#app-msg"), err.message, "err"));
+}
+
+async function start(){
+  $("#login").hidden = true; $("#app").hidden = false;
+  showTab("overview");
+}
+
+/* ---------- סקירה ---------- */
+async function loadOverview(){
+  const j = await call("admin_overview");
+  $("#me").textContent = j.me;
+  for (const k of ["leadsNew","leads","scansWeek","scans"]) $("#s-" + k).textContent = j[k];
+  $("#mail-warn").hidden = !!j.mailConfigured;
+}
+
+/* ---------- לידים ---------- */
+let leadsCache = [];
+$("#lead-filter").addEventListener("change", () => loadLeads().catch(err => msg($("#app-msg"), err.message, "err")));
+async function loadLeads(){
+  const status = $("#lead-filter").value;
+  const j = await call("admin_leads", status ? { status } : {});
+  leadsCache = j.leads || [];
+  const box = $("#leads"); box.replaceChildren();
+  if (!leadsCache.length) return box.append(el("div", { class: "card empty" }, "אין לידים להצגה"));
+  const tb = el("tbody");
+  for (const l of leadsCache) {
+    const sel = el("select", { "aria-label": "סטטוס" }, ...Object.entries(STATUS).map(([v,t]) => { const o = el("option", { value: v }, t); if (v === l.status) o.selected = true; return o; }));
+    const note = el("textarea", { placeholder: "הערה פנימית (מה דיברנו, מתי לחזור)", "aria-label": "הערה" }); note.value = l.admin_note || "";
+    const save = el("button", { class: "btn sm", onclick: async ev => {
+      ev.target.disabled = true;
+      try { await call("admin_lead_update", { id: l.id, status: sel.value, admin_note: note.value }); msg($("#app-msg"), "נשמר", "ok"); l.status = sel.value; pill.className = "pill " + sel.value; pill.textContent = STATUS[sel.value]; }
+      catch (err) { msg($("#app-msg"), err.message, "err"); }
+      ev.target.disabled = false;
+    }}, "שמירה");
+    const del = el("button", { class: "btn danger sm", onclick: async () => {
+      if (!confirmInline(del)) return;
+      try { await call("admin_lead_delete", { id: l.id }); msg($("#app-msg"), "הליד נמחק", "ok"); loadLeads(); }
+      catch (err) { msg($("#app-msg"), err.message, "err"); }
+    }}, "מחיקה");
+    const pill = el("span", { class: "pill " + l.status }, STATUS[l.status] || l.status);
+    const scan = l.pscan_scans;
+    const contact = el("div", null,
+      l.phone ? el("div", null, el("a", { href: "tel:" + l.phone.replace(/[^\d+]/g, ""), class: "ltr" }, l.phone)) : null,
+      l.email ? el("div", null, el("a", { href: "mailto:" + l.email, class: "ltr" }, l.email)) : null);
+    tb.append(
+      el("tr", null,
+        el("td", { "data-l": "תאריך" }, fmtDate(l.created_at)),
+        el("td", { "data-l": "שם" }, el("b", null, l.name || "–"), l.business ? el("div", { class: "hint" }, l.business) : null),
+        el("td", { "data-l": "פרטי קשר" }, contact),
+        el("td", { "data-l": "האתר" }, scan ? el("a", { href: "#", class: "ltr", onclick: ev => { ev.preventDefault(); openScan(l.scan_id); } }, scan.url) : "–", scan ? el("div", null, "ציון ", scoreEl(scan.score)) : null),
+        el("td", { "data-l": "סטטוס" }, pill)),
+      el("tr", null, el("td", { colspan: "5" },
+        l.note ? el("div", { class: "hint" }, "הערת הפונה: ", l.note) : null,
+        el("div", { class: "lead-edit" }, sel, note, el("div", { style: "display:flex;gap:6px" }, save, del)))));
+  }
+  box.append(el("table", { class: "table" }, el("thead", null, el("tr", null, ...["תאריך","שם ועסק","פרטי קשר","האתר שנסרק","סטטוס"].map(h => el("th", null, h)))), tb));
+}
+function confirmInline(btn){
+  if (btn.dataset.armed) return true;
+  btn.dataset.armed = "1"; const t = btn.textContent; btn.textContent = "ללחוץ שוב למחיקה";
+  setTimeout(() => { delete btn.dataset.armed; btn.textContent = t; }, 4000);
+  return false;
+}
+$("#btn-leads-csv").addEventListener("click", () => {
+  const q = v => { let s = String(v ?? ""); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+  const rows = [["תאריך","שם","עסק","טלפון","אימייל","הערת הפונה","סטטוס","הערה פנימית","אתר","ציון"]]
+    .concat(leadsCache.map(l => [fmtDate(l.created_at), l.name, l.business, l.phone, l.email, l.note, STATUS[l.status], l.admin_note, l.pscan_scans?.url, l.pscan_scans?.score]));
+  const blob = new Blob(["﻿" + rows.map(r => r.map(q).join(",")).join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = el("a", { href: URL.createObjectURL(blob), download: "leads.csv" }); document.body.append(a); a.click(); a.remove();
+});
+
+/* ---------- סריקות ---------- */
+$("#btn-scan-q").addEventListener("click", () => loadScans().catch(err => msg($("#app-msg"), err.message, "err")));
+$("#scan-q").addEventListener("keydown", e => { if (e.key === "Enter") $("#btn-scan-q").click(); });
+async function loadScans(){
+  const j = await call("admin_scans", { q: $("#scan-q").value });
+  const box = $("#scans"); box.replaceChildren();
+  if (!j.scans?.length) return box.append(el("div", { class: "card empty" }, "אין סריקות להצגה"));
+  const tb = el("tbody");
+  for (const s of j.scans) tb.append(el("tr", { class: "click", onclick: () => openScan(s.id) },
+    el("td", { "data-l": "תאריך" }, fmtDate(s.created_at)),
+    el("td", { "data-l": "אתר" }, el("span", { class: "ltr" }, s.host || s.url)),
+    el("td", { "data-l": "ציון" }, scoreEl(s.score)),
+    el("td", { "data-l": "חשיפה" }, s.exposure || "–"),
+    el("td", { "data-l": "טפסים" }, s.forms_count ?? "–"),
+    el("td", { "data-l": "כלי מעקב" }, s.trackers_count ?? "–"),
+    el("td", { "data-l": "פלטפורמה" }, s.cms || "–")));
+  box.append(el("table", { class: "table" }, el("thead", null, el("tr", null, ...["תאריך","אתר","ציון","חשיפה","טפסים","כלי מעקב","פלטפורמה"].map(h => el("th", null, h)))), tb));
+}
+async function openScan(id){
+  try {
+    const { scan } = await call("admin_scan_get", { id });
+    const r = scan.report || {};
+    $("#dlg-title").textContent = "דוח סריקה";
+    const body = $("#dlg-body"); body.replaceChildren(
+      el("p", null, el("span", { class: "ltr" }, r.finalUrl || scan.url), " · ", fmtDate(scan.created_at)),
+      el("p", null, "ציון ", scoreEl(r.score), " · חשיפה ", r.exposure || "–"),
+      r.summary ? el("p", { class: "hint" }, r.summary) : null,
+      ...(r.findings || []).map(f => el("div", { class: "finding" },
+        el("h4", null, f.title, el("span", { class: "sev " + f.severity }, SEV[f.severity] || f.severity)),
+        el("p", null, f.detail),
+        el("p", null, el("b", null, "מה לעשות: "), f.fix),
+        el("p", { class: "hint" }, "בסיס בחוק: ", f.law))));
+    $("#dlg").showModal();
+  } catch (err) { msg($("#app-msg"), err.message, "err"); }
+}
+$("#dlg-close").addEventListener("click", () => $("#dlg").close());
+
+/* ---------- הגדרות ---------- */
+const lines = v => v.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+async function loadSettings(){
+  const j = await call("admin_settings_get");
+  const s = j.settings || {};
+  $("#notify_enabled").checked = !!s.notify_enabled;
+  $("#notify_emails").value = (s.notify_emails || []).join("\n");
+  $("#admin_emails").value = (s.admin_emails || []).join("\n");
+  $("#sender_email").value = s.sender_email || "";
+  $("#sender_name").value = s.sender_name || "";
+  $("#settings-meta").textContent = s.updated_at ? `עודכן ${fmtDate(s.updated_at)}${s.updated_by ? " על ידי " + s.updated_by : ""}` : "–";
+  $("#provider-line").textContent = j.provider === "cloudflare" ? "ספק המיילים: Cloudflare ✓" : j.provider === "brevo" ? "ספק המיילים: Brevo ✓" : "ספק מיילים עוד לא חובר — מיילים לא יישלחו.";
+}
+$("#btn-save").addEventListener("click", async e => {
+  e.target.disabled = true;
+  try {
+    await call("admin_settings_save", {
+      notify_enabled: $("#notify_enabled").checked,
+      notify_emails: lines($("#notify_emails").value),
+      admin_emails: lines($("#admin_emails").value),
+      sender_email: $("#sender_email").value.trim(),
+      sender_name: $("#sender_name").value.trim(),
+    });
+    msg($("#app-msg"), "ההגדרות נשמרו", "ok");
+    await loadSettings();
+  } catch (err) { msg($("#app-msg"), err.message, "err"); }
+  e.target.disabled = false;
+});
+$("#btn-test").addEventListener("click", async e => {
+  e.target.disabled = true;
+  try { await call("admin_test_email"); msg($("#app-msg"), "מייל בדיקה נשלח. בדקו את התיבה (וגם את הספאם).", "ok"); }
+  catch (err) { msg($("#app-msg"), err.message, "err"); }
+  e.target.disabled = false;
+});
+
+if (token) start();
+</script>
+</body>
+</html>
