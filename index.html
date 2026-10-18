@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>בדיקת פרטיות לאתר</title>
+<meta name="description" content="בדיקה חינמית: האם האתר שלך עומד בתיקון 13 לחוק הגנת הפרטיות">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=Frank+Ruhl+Libre:wght@500;700&display=swap">
+<style>
+/* layout: one narrow reading column; the score sits as a stamp beside the summary; findings as a ledger with a severity rail */
+:root{
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#15202b; --muted:#5b6673; --line:#dfe3e8;
+  --accent:#0f4c81; --accent-ink:#ffffff;
+  --crit:#b3261e; --high:#c7731a; --med:#8a6d1a; --low:#4a6577; --ok:#1f7a4d;
+  --display:"Frank Ruhl Libre", "Heebo", serif; --body:"Heebo", system-ui, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f141a; --paper:#171e26; --ink:#e8edf2; --muted:#9aa7b4; --line:#2a3440;
+  --accent:#6fb1e8; --accent-ink:#0b1420; --crit:#ef6b62; --high:#eaa04a; --med:#d9b84a; --low:#8fa6b8; --ok:#4fc38a; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0f141a; --paper:#171e26; --ink:#e8edf2; --muted:#9aa7b4; --line:#2a3440;
+  --accent:#6fb1e8; --accent-ink:#0b1420; --crit:#ef6b62; --high:#eaa04a; --med:#d9b84a; --low:#8fa6b8; --ok:#4fc38a; color-scheme:dark }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:760px;margin:0 auto}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-block:22px 8px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:.01em}
+.brand small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.8rem;margin-inline-start:8px}
+.law{font-size:.8rem;color:var(--muted);letter-spacing:.04em}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,5vw,2.7rem);line-height:1.15;margin:34px 0 10px;text-wrap:balance}
+.lede{color:var(--muted);max-width:60ch;margin:0 0 26px;font-size:1.05rem}
+form.scan{display:flex;gap:10px;flex-wrap:wrap}
+form.scan input{flex:1 1 280px;min-width:0;font:inherit;font-size:1.05rem;padding:14px 16px;border:1.5px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);direction:ltr;text-align:left}
+form.scan input:focus{outline:3px solid color-mix(in srgb,var(--accent) 35%,transparent);border-color:var(--accent)}
+button.go{font:inherit;font-weight:700;font-size:1.05rem;padding:14px 26px;border:0;border-radius:6px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+button.go:disabled{opacity:.6;cursor:progress}
+.fine{font-size:.82rem;color:var(--muted);margin-top:10px}
+.status{margin-top:28px;color:var(--muted);font-size:.95rem}
+.status b{color:var(--ink)}
+
+/* report */
+.report{margin-top:34px}
+.head{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:start;padding:22px;background:var(--paper);border:1px solid var(--line);border-radius:8px}
+.stamp{width:118px;height:118px;border-radius:50%;display:grid;place-content:center;text-align:center;border:6px solid var(--stamp,var(--accent));color:var(--ink);font-variant-numeric:tabular-nums}
+.stamp .n{font-family:var(--display);font-size:2.6rem;font-weight:700;line-height:1}
+.stamp .l{font-size:.7rem;color:var(--muted);letter-spacing:.06em}
+.head .t{min-width:0}
+.head .site{font-size:.85rem;color:var(--muted);direction:ltr;text-align:right;word-break:break-all}
+.head h2{margin:2px 0 6px;font-size:1.35rem;font-weight:700}
+.pill{display:inline-block;font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:999px;color:#fff;background:var(--p,var(--accent));letter-spacing:.02em}
+.head p{margin:8px 0 0;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:12px}
+.facts div{background:var(--paper);padding:12px 14px;font-size:.9rem}
+.facts div span{display:block;color:var(--muted);font-size:.75rem;letter-spacing:.04em}
+.facts div b{font-weight:600}
+h3.sec{margin:30px 0 10px;font-size:1.05rem;font-weight:700;color:var(--muted);letter-spacing:.03em}
+.finding{display:grid;grid-template-columns:5px 1fr;gap:16px;background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.finding .rail{background:var(--sev)}
+.finding .body{padding:14px 16px 14px 0;min-width:0}
+.finding .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.finding .sev{font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--sev)}
+.finding h4{margin:0;font-size:1.05rem;font-weight:700}
+.finding p{margin:6px 0 0;font-size:.95rem}
+.finding .law{margin-top:8px;font-size:.82rem;color:var(--muted)}
+.finding .fix{margin-top:8px;padding:10px 12px;background:color-mix(in srgb,var(--ok) 9%,transparent);border-radius:6px;font-size:.92rem}
+.finding .fix b{color:var(--ok)}
+.finding .ev{font-size:.78rem;color:var(--muted);margin-top:6px;direction:ltr;text-align:right;word-break:break-all}
+.clean{padding:18px;border:1px dashed var(--ok);border-radius:8px;color:var(--ok)}
+
+/* lead */
+.cta{margin-top:34px;padding:22px;background:var(--paper);border:1px solid var(--line);border-radius:8px}
+.cta h3{margin:0 0 6px;font-family:var(--display);font-size:1.4rem}
+.cta p{margin:0 0 14px;color:var(--muted)}
+.cta .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.cta input{font:inherit;padding:12px 14px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);min-width:0}
+.cta button{grid-column:1/-1;justify-self:start}
+.cta .done{color:var(--ok);font-weight:600}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted);max-width:70ch}
+.example{font-size:.78rem;color:var(--muted);text-align:center;margin-top:28px}
+@media (max-width:480px){.head{grid-template-columns:1fr}.stamp{width:100px;height:100px}}
+@media (prefers-reduced-motion:no-preference){.report{animation:in .35s ease-out}@keyframes in{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">בדיקת פרטיות לאתר<small>גרסת ניסיון</small></div>
+  <div class="law">תיקון 13 לחוק הגנת הפרטיות</div>
+</header>
+
+<h1>הטופס באתר שלך יכול לעלות לך 30,000 ש"ח.</h1>
+<p class="lede">מאוגוסט 2025 כל עסק בישראל חייב לצרף הודעת יידוע לכל טופס שאוסף פרטים. באוגוסט 2026 הוטל העיצום הראשון על עסק קטן בדיוק על זה. הכנס את כתובת האתר ונבדוק תוך דקה.</p>
+
+<form class="scan" id="scanForm">
+  <input id="url" type="text" inputmode="url" autocomplete="url" placeholder="www.your-site.co.il" required>
+  <button class="go" id="goBtn" type="submit">בדוק את האתר</button>
+</form>
+<p class="fine">הבדיקה קוראת את העמוד כמו גולש רגיל, בלי להתחבר ובלי לשלוח טפסים. לא נשמרים פרטים אישיים.</p>
+
+<div class="status" id="status" hidden></div>
+<section class="report" id="report" hidden></section>
+<p class="example" id="exampleNote" hidden>זוהי דוגמה. הכנס כתובת למעלה כדי לבדוק אתר אמיתי.</p>
+
+<section class="cta" id="cta" hidden>
+  <h3>רוצה שנסדר את זה?</h3>
+  <p>נוסח יידוע לכל טופס, מדיניות פרטיות מעודכנת ותיק עמידה בחוק, מותאם לעסק שלך. השאר פרטים ונחזור אליך.</p>
+  <form id="leadForm">
+    <div class="row">
+      <input id="leadName" placeholder="שם" autocomplete="name">
+      <input id="leadBiz" placeholder="שם העסק" autocomplete="organization">
+      <input id="leadPhone" placeholder="טלפון" inputmode="tel" autocomplete="tel">
+      <input id="leadEmail" placeholder="אימייל" inputmode="email" autocomplete="email">
+      <button class="go" id="leadBtn" type="submit">חזרו אליי</button>
+    </div>
+    <p class="fine">הפרטים נאספים כדי לחזור אליך בעניין פנייתך בלבד. המסירה מרצון; בלעדיה לא נוכל לחזור אליך. המידע לא יועבר לצד שלישי. בעל השליטה: בראנץ תעשיות שיש, tzur@baranetz.com. עומדת לך זכות לעיין במידע ולבקש את תיקונו.</p>
+    <p class="done" id="leadDone" hidden>קיבלנו. נחזור אליך בהקדם.</p>
+  </form>
+</section>
+
+<footer>הבדיקה אוטומטית ובודקת רק מה שנראה מבחוץ בעמוד הבית ובעמוד מדיניות הפרטיות. היא אינה ייעוץ משפטי ואינה מחליפה בדיקה של כל המאגרים, הספקים והנהלים של העסק. סכומי העיצומים לפי המדריך המקצועי של הרשות להגנת הפרטיות לתיקון 13.</footer>
+</div>
+
+<script>
+const API = "https://bevtzoskhspkhekkytus.supabase.co/functions/v1/scan";
+const SEV = {critical:["קריטי","var(--crit)"],high:["גבוה","var(--high)"],medium:["בינוני","var(--med)"],low:["נמוך","var(--low)"],info:["מידע","var(--low)"]};
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let currentScanId = null;
+
+function render(r, isExample){
+  const stamp = r.score >= 80 ? "var(--ok)" : r.score >= 50 ? "var(--high)" : "var(--crit)";
+  const pill = r.exposure === "גבוהה" ? "var(--crit)" : r.exposure === "בינונית" ? "var(--high)" : "var(--ok)";
+  const yes = v => v ? "כן" : "לא";
+  let h = `<div class="head" style="--stamp:${stamp}">
+    <div class="stamp"><div class="n">${r.score}</div><div class="l">מתוך 100</div></div>
+    <div class="t"><div class="site">${esc(r.finalUrl)}</div>
+      <h2>חשיפה לעיצום: <span class="pill" style="--p:${pill}">${esc(r.exposure)}</span></h2>
+      <p>${esc(r.summary)}</p></div></div>
+  <div class="facts">
+    <div><span>טפסים שנמצאו</span><b>${r.meta.formsCount}</b></div>
+    <div><span>מדיניות פרטיות</span><b>${yes(r.privacyPolicy.found)}</b></div>
+    <div><span>כלי מעקב</span><b>${r.trackers.length ? esc(r.trackers.join(", ")) : "לא נמצאו"}</b></div>
+    <div><span>הצפנה (HTTPS)</span><b>${yes(r.https.ok)}</b></div>
+    <div><span>SPF / DMARC</span><b>${yes(r.dns.spf)} / ${yes(r.dns.dmarc)}</b></div>
+    ${r.meta.cms ? `<div><span>פלטפורמה</span><b>${esc(r.meta.cms)}</b></div>` : ""}
+  </div>`;
+  h += `<h3 class="sec">ממצאים (${r.findings.length})</h3>`;
+  if (!r.findings.length) h += `<div class="clean">לא נמצאו ליקויים בבדיקה החיצונית. זה לא אומר שהעסק עומד בכל החוק, אבל זו התחלה טובה.</div>`;
+  for (const f of r.findings) {
+    const [name, color] = SEV[f.severity] || SEV.info;
+    h += `<article class="finding" style="--sev:${color}"><div class="rail"></div><div class="body">
+      <div class="top"><span class="sev">${name}</span><h4>${esc(f.title)}</h4></div>
+      <p>${esc(f.detail)}</p>
+      <div class="law">${esc(f.law)}</div>
+      <div class="fix"><b>מה לעשות:</b> ${esc(f.fix)}</div>
+      ${f.evidence ? `<div class="ev">${esc(f.evidence)}</div>` : ""}</div></article>`;
+  }
+  const rep = document.getElementById("report");
+  rep.innerHTML = h; rep.hidden = false;
+  document.getElementById("exampleNote").hidden = !isExample;
+  document.getElementById("cta").hidden = isExample;
+}
+
+document.getElementById("scanForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const url = document.getElementById("url").value.trim();
+  const btn = document.getElementById("goBtn"), st = document.getElementById("status");
+  btn.disabled = true; st.hidden = false; st.innerHTML = "בודק את <b>" + esc(url) + "</b>… קורא את העמוד, מחפש טפסים, מדיניות פרטיות ורשומות DNS.";
+  document.getElementById("report").hidden = true; document.getElementById("cta").hidden = true; document.getElementById("exampleNote").hidden = true;
+  try {
+    const res = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ url }) });
+    const r = await res.json();
+    if (!res.ok || r.error) { st.textContent = r.error || "משהו השתבש. נסה שוב."; return; }
+    currentScanId = r.scan_id; st.hidden = true; render(r, false);
+    document.getElementById("report").scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch { st.textContent = "לא הצלחנו להתחבר לשרת הבדיקה. נסה שוב בעוד רגע."; }
+  finally { btn.disabled = false; }
+});
+
+document.getElementById("leadForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const g = id => document.getElementById(id).value.trim();
+  const body = { action: "lead", scan_id: currentScanId, name: g("leadName"), business: g("leadBiz"), phone: g("leadPhone"), email: g("leadEmail") };
+  if (!body.phone && !body.email) { document.getElementById("leadPhone").focus(); return; }
+  const btn = document.getElementById("leadBtn"); btn.disabled = true;
+  try {
+    const res = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+    if (res.ok) { document.getElementById("leadDone").hidden = false; btn.hidden = true; }
+    else btn.disabled = false;
+  } catch { btn.disabled = false; }
+});
+
+// דוגמה במנוחה: מה שרואים לפני שמכניסים כתובת
+render({
+  finalUrl: "https://example-business.co.il", score: 40, exposure: "גבוהה",
+  summary: "נמצאו 1 טפסים. 1 מהם בלי הודעת יידוע מלאה. אין מדיניות פרטיות. 2 כלי מעקב.",
+  meta: { formsCount: 1, cms: "WordPress + Elementor" }, privacyPolicy: { found: false }, trackers: ["Meta Pixel", "Google Analytics"],
+  https: { ok: true }, dns: { spf: true, dmarc: false },
+  findings: [
+    { severity: "critical", title: "טופס 1: חסרה הודעת יידוע מלאה", detail: "ליד הטופס לא נמצאו הפרטים: חובה/רשות ותוצאת אי-הסכמה, למי יימסר המידע, זכות עיון ותיקון.", law: "סעיף 11 לחוק הגנת הפרטיות. עיצום: 50 ש\"ח לאדם, מינימום 30,000 ש\"ח.", fix: "להוסיף מתחת לכפתור השליחה 2–3 שורות יידוע עם קישור למדיניות הפרטיות.", evidence: "שדות: fullname, phone, email" },
+    { severity: "critical", title: "לא נמצאה מדיניות פרטיות", detail: "לא נמצא עמוד מדיניות פרטיות באתר.", law: "סעיף 11; הנחיית הרשות — חובת יידוע.", fix: "לפרסם מדיניות פרטיות בעברית עם 5 פרטי היידוע ופירוט פיקסלים." },
+    { severity: "medium", title: "אין רשומת DMARC", detail: "אין מדיניות שמורה לשרתים לדחות מיילים מזויפים בשם הדומיין.", law: "לא חובה בתקנות, אבל מונע התחזות למייל העסק.", fix: "להוסיף רשומת _dmarc." }
+  ]
+}, true);
+</script>
+</body>
+</html>
