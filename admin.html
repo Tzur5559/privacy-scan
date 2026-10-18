@@ -82,6 +82,13 @@ dialog .db{padding:16px 20px;overflow:auto}
 .sev.critical,.sev.high{background:var(--crit-soft);color:var(--crit)}
 .sev.medium{background:var(--warn-soft);color:var(--warn)}
 .sev.low,.sev.info{background:#f1f5f9;color:var(--muted)}
+.howto{margin-top:8px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:#fafbff}
+.howto summary{cursor:pointer;font-weight:600;color:var(--brand)}
+.howto ol{padding-inline-start:20px;margin:6px 0}
+.cbox{border:1px solid var(--line);border-radius:8px;background:#fff;margin-top:8px}
+.chead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);font-size:.88rem}
+.cpre{margin:0;padding:10px;white-space:pre-wrap;word-break:break-word;font:inherit;font-size:.9rem;max-height:220px;overflow:auto}
+.cpre.ltr{direction:ltr;text-align:left;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem}
 .switch{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:600;color:var(--ink)}
 .switch input{width:20px;height:20px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -385,9 +392,26 @@ async function openScan(id){
         el("h4", null, f.title, el("span", { class: "sev " + f.severity }, SEV[f.severity] || f.severity)),
         el("p", null, f.detail),
         el("p", null, el("b", null, "מה לעשות: "), f.fix),
+        f.howTo ? howToEl(f.howTo) : null,
         el("p", { class: "hint" }, "בסיס בחוק: ", f.law))));
     $("#dlg").showModal();
   } catch (err) { msg($("#app-msg"), err.message, "err"); }
+}
+function howToEl(h){
+  const copyBlock = c => {
+    const pre = el("pre", { class: "cpre" + (c.ltr ? " ltr" : "") }, c.text);
+    const btn = el("button", { class: "btn ghost sm", onclick: async () => {
+      try { await navigator.clipboard.writeText(c.text); btn.textContent = "הועתק ✓"; } catch { btn.textContent = "לא הועתק"; }
+      setTimeout(() => btn.textContent = "העתקה", 1500);
+    }}, "העתקה");
+    return el("div", { class: "cbox" }, el("div", { class: "chead" }, el("b", null, c.label), btn), pre);
+  };
+  return el("details", { class: "howto" },
+    el("summary", null, `איך מתקנים · ${h.time} · ${h.who}`),
+    el("p", null, el("b", null, "למה זה חשוב: "), h.why),
+    el("ol", null, ...h.steps.map(s => el("li", null, s))),
+    ...(h.copy || []).map(copyBlock),
+    h.platform ? el("div", { class: "hint" }, el("b", null, `הוראות ל-${h.platform.name}: `), h.platform.steps.join(" · ")) : null);
 }
 $("#dlg-close").addEventListener("click", () => $("#dlg").close());
 

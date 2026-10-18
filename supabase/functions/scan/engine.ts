@@ -1,7 +1,17 @@
 // מנוע סריקה פסיבי — תיקון 13 לחוק הגנת הפרטיות
 // רץ על Deno (Supabase Edge) ועל Node 22 (בדיקות). רק web APIs.
+import { addHowTo } from "./fixes.ts";
 
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
+
+export interface HowTo {
+  why: string;                                   // למה זה חשוב, בשפה פשוטה
+  steps: string[];                               // מה לעשות, צעד אחרי צעד
+  copy?: { label: string; text: string; ltr?: boolean }[];   // נוסח מוכן להעתקה
+  platform?: { name: string; steps: string[] };  // הוראות לפי הפלטפורמה שזוהתה
+  who: string;                                   // מי יכול לבצע
+  time: string;                                  // כמה זמן זה לוקח
+}
 
 export interface Finding {
   id: string;
@@ -9,8 +19,9 @@ export interface Finding {
   title: string;        // עברית, קצר
   detail: string;       // עברית, מה נמצא
   law: string;          // הבסיס המשפטי
-  fix: string;          // מה לעשות
+  fix: string;          // מה לעשות (שורה אחת)
   evidence?: string;    // קטע/URL
+  howTo?: HowTo;        // הפתרון המלא
 }
 
 export interface FormInfo {
@@ -39,8 +50,12 @@ export interface ScanReport {
   dns: { spf: boolean; dmarc: boolean };
   headers: Record<string, boolean>;
   findings: Finding[];
-  // סטטיסטיקה פנימית לסקר השוק
-  meta: { formsCount: number; trackersCount: number; cms?: string };
+  // סטטיסטיקה פנימית + נתונים להתאמת הפתרונות
+  meta: {
+    formsCount: number; trackersCount: number; cms?: string;
+    siteName?: string; contactEmail?: string; contactPhone?: string;
+    mailProvider?: string; dnsProvider?: string; host?: string;
+  };
 }
 
 // ---------- מילונים ----------
@@ -229,6 +244,36 @@ async function dnsTxt(name: string): Promise<string[]> {
   } catch { return []; }
 }
 
+async function dnsRecords(name: string, type: "MX" | "NS"): Promise<string[]> {
+  try {
+    const r = await fetch(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(name)}&type=${type}`, { headers: { accept: "application/dns-json" } });
+    if (!r.ok) return [];
+    const j = await r.json();
+    return (j.Answer || []).map((a: { data: string }) => String(a.data).toLowerCase());
+  } catch { return []; }
+}
+
+function mailProviderOf(mx: string[]): string | undefined {
+  const all = mx.join(" ");
+  if (/google\.com|googlemail/.test(all)) return "Google Workspace";
+  if (/outlook\.com|protection\.outlook/.test(all)) return "Microsoft 365";
+  if (/zoho/.test(all)) return "Zoho";
+  if (/secureserver|godaddy/.test(all)) return "GoDaddy";
+  if (/wix/.test(all)) return "Wix";
+  if (mx.length) return "אחר";
+  return undefined;
+}
+function dnsProviderOf(ns: string[]): string | undefined {
+  const all = ns.join(" ");
+  const map: Array<[RegExp, string]> = [
+    [/cloudflare/, "Cloudflare"], [/wixdns/, "Wix"], [/domaincontrol/, "GoDaddy"], [/azure-dns/, "Azure"],
+    [/awsdns/, "Amazon Route 53"], [/googledomains|ns-cloud/, "Google Cloud DNS"], [/livedns\.co\.il/, "LiveDNS"],
+    [/hostinger|dns-parking/, "Hostinger"], [/siteground/, "SiteGround"], [/box\.co\.il|cpanel|websitewelcome/, "ספק האחסון (cPanel)"],
+    [/interspace/, "אינטרספייס"], [/register\.co\.il|dnslive/, "Register / LiveDNS"], [/shopify/, "Shopify"],
+  ];
+  return map.find(([re]) => re.test(all))?.[1] ?? (ns.length ? undefined : undefined);
+}
+
 // ---------- ניתוח HTML ----------
 
 export function analyzeHtml(html: string, pageUrl: string) {
@@ -305,7 +350,21 @@ export function analyzeHtml(html: string, pageUrl: string) {
     }
   }
 
-  return { text, trackers, cms, privacyUrl, forms };
+  // שם העסק ופרטי קשר — כדי למלא את הנוסחים המוכנים
+  const ogName = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']{2,80})["']/i)?.[1]
+    ?? html.match(/<meta[^>]+content=["']([^"']{2,80})["'][^>]+property=["']og:site_name["']/i)?.[1];
+  const title = html.match(/<title[^>]*>([^<]{2,200})<\/title>/i)?.[1];
+  const decode = (t: string) => t.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/&nbsp;/g, " ").replace(/&#8211;|&ndash;/g, "-").replace(/&#8217;/g, "'").replace(/&[a-z#0-9]+;/gi, "").trim();
+  let siteName = ogName ? decode(ogName) : title ? decode(title).split(/\s[|\-–—:]\s/)[0].trim() : undefined;
+  if (siteName && (siteName.length < 2 || siteName.length > 60)) siteName = undefined;
+  const mails = [...html.matchAll(/mailto:([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,})/gi)].map(m => m[1].toLowerCase());
+  const textMails = [...text.matchAll(/\b([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,})\b/gi)].map(m => m[1].toLowerCase());
+  const contactEmail = [...mails, ...textMails].find(e => !/(example|sentry|wixpress|wordpress|domain\.com|email\.com|\.png|\.jpg)/.test(e));
+  const tels = [...html.matchAll(/tel:([+\d\-\s()]{7,20})/gi)].map(m => m[1].trim());
+  const textTels = [...text.matchAll(/(?:^|[^\d])(0(?:[2-489]|5\d|7\d)[-\s]?\d{3}[-\s]?\d{4}|\*\d{4})(?!\d)/g)].map(m => m[1]);
+  const contactPhone = [...tels, ...textTels][0];
+
+  return { text, trackers, cms, privacyUrl, forms, siteName, contactEmail, contactPhone };
 }
 
 export function analyzePrivacyPolicy(html: string) {
@@ -358,7 +417,7 @@ export async function scan(inputUrl: string): Promise<ScanReport> {
   }
 
   // DNS
-  const [spfTxt, dmarcTxt] = await Promise.all([dnsTxt(host), dnsTxt(`_dmarc.${host}`)]);
+  const [spfTxt, dmarcTxt, mx, ns] = await Promise.all([dnsTxt(host), dnsTxt(`_dmarc.${host}`), dnsRecords(host, "MX"), dnsRecords(host, "NS")]);
   const dns = { spf: spfTxt.some(t => /^v=spf1/i.test(t)), dmarc: dmarcTxt.some(t => /^v=DMARC1/i.test(t)) };
 
   // כותרות
@@ -456,11 +515,17 @@ export async function scan(inputUrl: string): Promise<ScanReport> {
     ? `לא נמצאו טפסים לאיסוף פרטים בעמוד הבית. ${pp.found ? "יש מדיניות פרטיות." : "לא נמצאה מדיניות פרטיות."} ${a.trackers.length ? `נמצאו ${a.trackers.length} כלי מעקב.` : ""}`
     : `נמצאו ${a.forms.length} טפסים. ${a.forms.filter(f => !f.hasNoticeNearby).length} מהם בלי הודעת יידוע מלאה. ${pp.found ? "יש מדיניות פרטיות." : "אין מדיניות פרטיות."} ${a.trackers.length ? `${a.trackers.length} כלי מעקב.` : ""}`;
 
-  return {
+  const report: ScanReport = {
     url: inputUrl, finalUrl: page.finalUrl, scannedAt: new Date().toISOString(), score, exposure, summary,
     forms: a.forms, trackers: a.trackers,
     privacyPolicy: { found: pp.found, url: pp.url, hits: pp.hits, oldTerms: pp.oldTerms },
     https, dns, headers, findings,
-    meta: { formsCount: a.forms.length, trackersCount: a.trackers.length, cms: a.cms },
+    meta: {
+      formsCount: a.forms.length, trackersCount: a.trackers.length, cms: a.cms,
+      siteName: a.siteName, contactEmail: a.contactEmail, contactPhone: a.contactPhone,
+      mailProvider: mailProviderOf(mx), dnsProvider: dnsProviderOf(ns), host,
+    },
   };
+  addHowTo(report);
+  return report;
 }

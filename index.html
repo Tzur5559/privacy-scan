@@ -152,6 +152,28 @@ section.alt{background:var(--bg-2);border-top:1px solid var(--line);border-botto
 .finding .fix{margin-top:12px;background:var(--ok-soft);border-radius:10px;padding:12px 14px;font-size:.96rem;color:#065f46}
 .finding .fix b{color:var(--ok)}
 .finding .ev{margin-top:8px;font-size:.82rem;color:var(--muted);direction:ltr;text-align:right;overflow-wrap:anywhere}
+/* full fix */
+.howto{margin-top:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg-2)}
+.howto>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;font-family:var(--head);font-weight:600;color:var(--brand)}
+.howto>summary::-webkit-details-marker{display:none}
+.howto>summary .chev{transition:transform .2s;flex:none}
+.howto[open]>summary .chev{transform:rotate(180deg)}
+.howto>summary .meta{display:flex;gap:6px;flex-wrap:wrap;font-family:var(--body);font-weight:600;font-size:.8rem;color:var(--muted)}
+.howto>summary .meta span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+.howto .hb{padding:0 16px 16px}
+.howto h5{font-family:var(--head);font-size:.95rem;color:var(--ink);margin:14px 0 6px}
+.howto .why{margin:0;color:var(--text)}
+.howto ol{margin:0;padding-inline-start:22px;display:grid;gap:6px}
+.howto ol li::marker{color:var(--brand);font-weight:700}
+.copyb{background:#fff;border:1px solid var(--line);border-radius:10px;margin-top:8px;overflow:hidden}
+.copyb .ch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:.86rem;font-weight:600;color:var(--ink)}
+.copyb pre{margin:0;padding:12px 14px;white-space:pre-wrap;word-break:break-word;font-family:var(--body);font-size:.93rem;line-height:1.65;max-height:260px;overflow:auto;color:var(--text)}
+.copyb pre.ltr{direction:ltr;text-align:left;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85rem}
+.cbtn{flex:none;border:0;border-radius:8px;padding:6px 12px;font-family:var(--head);font-weight:600;font-size:.82rem;cursor:pointer;background:var(--brand-soft);color:var(--brand)}
+.cbtn.done{background:var(--ok-soft);color:var(--ok)}
+.plat{margin-top:6px;background:#fff;border:1px dashed #c7d2fe;border-radius:10px;padding:10px 14px}
+.plat b{color:var(--brand)}
+.ph-note{margin-top:8px;font-size:.84rem;color:var(--muted)}
 .clean{background:var(--ok-soft);border:1px solid #a7f3d0;color:#065f46;border-radius:14px;padding:20px}
 .r-note{color:var(--muted);font-size:.92rem;margin-top:18px}
 
@@ -369,7 +391,34 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;
 const $ = id => document.getElementById(id);
 let currentScanId = null;
 
+let copyTexts = [];
+function howToHtml(h){
+  let x = `<details class="howto"><summary><span>איך מתקנים — צעד אחרי צעד</span><span class="meta"><span>${esc(h.time)}</span><span>${esc(h.who)}</span></span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary><div class="hb">`;
+  x += `<h5>למה זה חשוב</h5><p class="why">${esc(h.why)}</p>`;
+  x += `<h5>מה עושים</h5><ol>${h.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>`;
+  if (h.copy?.length) {
+    x += `<h5>נוסח מוכן להעתקה</h5>`;
+    for (const c of h.copy) {
+      const i = copyTexts.push(c.text) - 1;
+      x += `<div class="copyb"><div class="ch"><span>${esc(c.label)}</span><button type="button" class="cbtn" data-copy="${i}">העתקה</button></div><pre class="${c.ltr ? "ltr" : ""}">${esc(c.text)}</pre></div>`;
+    }
+    if (h.copy.some(c => /\[[^\]]+\]/.test(c.text))) x += `<p class="ph-note">מה שבסוגריים מרובעים [ ] — ממלאים בעצמכם לפני הפרסום.</p>`;
+  }
+  if (h.platform) x += `<h5>הוראות ל-${esc(h.platform.name)}</h5><div class="plat"><ol>${h.platform.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol></div>`;
+  return x + `</div></details>`;
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest?.("[data-copy]");
+  if (!b) return;
+  const t = copyTexts[+b.dataset.copy] ?? "";
+  try { await navigator.clipboard.writeText(t); }
+  catch { const ta = document.createElement("textarea"); ta.value = t; document.body.append(ta); ta.select(); try { document.execCommand("copy"); } catch {} ta.remove(); }
+  b.textContent = "הועתק ✓"; b.classList.add("done");
+  setTimeout(() => { b.textContent = "העתקה"; b.classList.remove("done"); }, 1800);
+});
+
 function render(r){
+  copyTexts = [];
   const c = r.score >= 80 ? "var(--ok)" : r.score >= 50 ? "var(--warn)" : "var(--crit)";
   const [pc, pb] = r.exposure === "גבוהה" ? ["var(--crit)","var(--crit-soft)"] : r.exposure === "בינונית" ? ["var(--warn)","var(--warn-soft)"] : ["var(--ok)","var(--ok-soft)"];
   const yes = v => v ? "כן" : "לא";
@@ -399,13 +448,14 @@ function render(r){
         <p>${esc(f.detail)}</p>
         <div class="lawline">${esc(f.law)}</div>
         <div class="fix"><b>מה לעשות:</b> ${esc(f.fix)}</div>
+        ${f.howTo ? howToHtml(f.howTo) : ""}
         ${f.evidence ? `<div class="ev">${esc(f.evidence)}</div>` : ""}
       </article>`;
     }
   } else {
     h += `<div class="clean">לא נמצאו ליקויים במה שגלוי מבחוץ. זו התחלה טובה, אבל החוק דורש גם מסמכים ונהלים פנימיים שבדיקה חיצונית לא רואה.</div>`;
   }
-  h += `<p class="r-note">הבדיקה אוטומטית ובודקת רק את מה שגלוי מבחוץ. <a href="#lead">רוצים שנעבור על הכל ונסדר את זה בשבילכם?</a></p></div>`;
+  h += `<p class="r-note">הנוסחים הם נוסח לדוגמה ואינם ייעוץ משפטי — מומלץ שעורך דין יעבור עליהם. הבדיקה אוטומטית ובודקת רק את מה שגלוי מבחוץ. <a href="#lead">רוצים שנעבור על הכל ונסדר את זה בשבילכם?</a></p></div>`;
   const s = $("results"); s.innerHTML = h; s.hidden = false;
   s.scrollIntoView({ behavior: "smooth", block: "start" });
 }
